@@ -1,0 +1,195 @@
+ :root{
+      --orange:#ff8c42;
+      --cream:#fff7e6;
+      --dark:#2d2d2d;
+      --muted:#6b6b6b;
+      --glass: rgba(255,255,255,0.92);
+      --accent-shadow: rgba(255,140,66,0.14);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--dark);background:linear-gradient(180deg,#fffaf0 0%,var(--cream) 100%);-webkit-font-smoothing:antialiased}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:80;backdrop-filter:blur(8px);background:var(--glass);display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:3px solid rgba(255,140,66,0.06)}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo img{width:54px;height:54px;border-radius:12px;object-fit:cover;box-shadow:0 8px 24px var(--accent-shadow)}
+    .logo h1{margin:0;font-size:1.05rem;letter-spacing:0.6px}
+    nav a{margin-left:18px;text-decoration:none;color:var(--dark);font-weight:600;opacity:0.95}
+    nav a.active,nav a:hover{color:var(--orange)}
+
+    /* Hero */
+    .hero{display:flex;gap:36px;align-items:center;justify-content:space-between;padding:64px 6%;background:linear-gradient(90deg,var(--orange),#ff9b5a);color:white;border-radius:0 0 28px 28px}
+    .hero-left{max-width:640px}
+    .hero h2{font-size:2.6rem;margin:0 0 10px;line-height:1.05}
+    .tagline{display:inline-block;background:rgba(255,255,255,0.12);padding:6px 12px;border-radius:999px;font-weight:700;margin-top:10px}
+    .hero p{margin:14px 0 22px;color:rgba(255,255,255,0.95);font-size:1.05rem}
+    .cta-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+    .btn-primary{background:white;color:var(--orange);padding:12px 20px;border-radius:12px;font-weight:800;text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,0.12);display:inline-block;transition:transform .15s ease}
+    .btn-primary:hover{transform:translateY(-6px)}
+    .btn-ghost{background:transparent;border:2px solid rgba(255,255,255,0.18);color:white;padding:10px 18px;border-radius:10px;font-weight:700;text-decoration:none}
+    .hero-right img{width:420px;border-radius:18px;box-shadow:0 20px 40px rgba(0,0,0,0.18);transform-origin:center;animation:float 4s ease-in-out infinite}
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+    /* USP */
+    .usp{padding:44px 6%;display:flex;gap:18px;justify-content:center;flex-wrap:wrap;background:#fff}
+    .usp-card{width:220px;background:linear-gradient(180deg,#fffaf6,#fff7ee);padding:18px;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,0.06);text-align:center;font-weight:700}
+    .usp-card small{display:block;color:var(--muted);font-weight:600;margin-top:8px;font-size:.9rem}
+
+    /* Menu preview */
+    .menu-preview{padding:48px 6%;background:linear-gradient(180deg,#fffbea 0%, #fff9f0 100%);border-top:6px solid rgba(255,140,66,0.04)}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+    .menu-card{background:white;border-radius:14px;padding:12px;box-shadow:0 12px 26px rgba(0,0,0,0.07);transition:transform .18s ease;overflow:hidden}
+    .menu-card:hover{transform:translateY(-8px)}
+    .menu-card img{width:100%;height:180px;object-fit:cover;border-radius:10px}
+    .menu-card h4{color:var(--orange);margin:8px 0 4px}
+    .menu-card p{margin:0;color:var(--muted);font-size:.95rem}
+
+    /* Promo ribbon & badge */
+    .promo-ribbon{position:fixed;left:20px;top:90px;background:var(--orange);color:white;padding:8px 12px;border-radius:999px;font-weight:800;box-shadow:0 8px 20px rgba(0,0,0,0.12);z-index:90;transform:rotate(-6deg)}
+    .promo-ribbon small{display:block;font-weight:600;font-size:.78rem;opacity:.95}
+
+    /* Testimonial */
+    .testi{padding:48px 6%;background:white}
+    .testi-grid{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
+    .testi-card{background:linear-gradient(180deg,#fff7ee,#fffaf2);padding:18px;border-radius:12px;max-width:320px;box-shadow:0 8px 20px rgba(0,0,0,0.06)}
+
+ footer {
+    background: #0f1624;
+    color: #fff;
+    padding: 60px 20px 30px;
+  }
+
+  .footer-container {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .footer-brand {
+    max-width: 350px;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .footer-logo img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #ff8c42;
+    object-fit: cover;
+  }
+
+  .footer-logo h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .footer-brand p {
+    margin-top: 10px;
+    color: #dcdcdc;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .footer-section h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-links li {
+    margin-bottom: 10px;
+  }
+
+  .footer-links a {
+    color: #dcdcdc;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+
+  .footer-links a:hover {
+    color: #ff8c42;
+  }
+
+  .social-icons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .social-icons a {
+    width: 38px;
+    height: 38px;
+    background: #1a2435;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+
+  .social-icons img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .social-icons a:hover {
+    background: #ff8c42;
+  }
+
+  .footer-line {
+    width: 100%;
+    height: 1px;
+    background: rgba(255,255,255,0.16);
+    margin-top: 40px;
+  }
+
+  @media(max-width: 768px) {
+    .footer-container {
+      flex-direction: column;
+    }
+  }
+    /* Floating WA helper */
+    .wa-btn{position:fixed;right:20px;bottom:20px;background:#25D366;color:white;padding:12px 16px;border-radius:999px;font-weight:800;text-decoration:none;box-shadow:0 12px 30px rgba(0,0,0,0.18);z-index:999}
+
+    /* Promo popup (scroll) - top of voucher 
+    .promo-popup{position:fixed;right:20px;bottom:140px;background:white;padding:14px 16px;border-radius:12px;border-left:6px solid var(--orange);box-shadow:0 20px 50px rgba(0,0,0,0.12);display:none;z-index:995;max-width:280px}
+    .promo-popup strong{display:block;color:var(--dark);margin-bottom:6px}
+*/
+    /* Voucher popup (bottom) - sits below promo */
+    .voucher-popup{position:fixed;right:20px;bottom:20px;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:9999;pointer-events:none}
+    .voucher-box{pointer-events:auto;background:white;padding:18px;border-radius:12px;border:3px solid var(--orange);max-width:340px;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.18)}
+    .voucher-box h3{margin:0;color:var(--orange)}
+    .claim-btn{background:var(--orange);color:white;border:none;padding:10px 16px;border-radius:10px;font-weight:800;cursor:pointer;margin-top:12px}
+
+    /* Floating limited promo (small) */
+    .floating-promo{position:fixed;left:20px;bottom:20px;background:#fff;padding:10px;border-radius:12px;border-left:6px solid var(--orange);box-shadow:0 12px 28px rgba(0,0,0,0.12);font-size:.9rem;z-index:980;display:none}
+
+    /* Responsive tweaks */
+    @media(max-width:900px){
+      .hero{padding:40px 6%}
+      .hero-right img{width:320px}
+      .menu-card img{height:160px}
+      .promo-popup{right:12px;left:12px;bottom:140px}
+      .voucher-popup{right:12px;left:12px;bottom:12px}
+    }
+    @media(max-width:540px){
+      .hero-right img{display:none}
+      .usp{padding:28px 6%}
+      .menu-grid{grid-template-columns:repeat(2,1fr)}
+    }
