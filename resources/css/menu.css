@@ -1,4 +1,4 @@
-    :root {
+        :root {
       --orange: #ff8c42;
       --light-orange: #ffe4c2;
       --cream: #fff8ef;
@@ -699,24 +699,29 @@
       margin-top: 40px;
     }
 
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media(max-width: 768px) {
       .footer-container {
         flex-direction: column;
       }
-      
+
       .modal-content {
         width: 95%;
         margin: 5% auto;
       }
-      
+
       .product-image {
         height: 220px;
       }
-      
+
       header {
         padding: 12px 20px;
       }
-      
+
       nav a {
         margin-left: 10px;
         font-size: 0.9rem;

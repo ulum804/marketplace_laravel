@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\TokoModel;
+use App\Models\ProdukModel;
 use Illuminate\Http\Request;
 use Exception;
 
@@ -13,9 +14,12 @@ class TokoController extends Controller
      */
     public function index()
     {
-        // $toko = TokoModel::all();
-        // // print_r($toko);
-        // return view('market.order', compact('toko'));
+        $toko = TokoModel::all();
+        // print_r($toko);
+        if (request()->ajax()) {
+            return response()->json($toko);
+        }
+        return view('admin.admin', compact('toko'));
         // $buku = Buku::all();
         // print_r($buku);
         // return view('buku.index', compact('buku'))
@@ -83,6 +87,9 @@ class TokoController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $toko = TokoModel::findOrFail($id);
+        $toko->delete();
+
+        return response()->json(['success' => true, 'message' => 'Pesanan berhasil dihapus.']);
     }
 }

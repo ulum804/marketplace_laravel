@@ -245,9 +245,9 @@
 </footer>
 
   <!-- WhatsApp helper (NOT for ordering) -->
-  <a class="wa-btn" id="waBtn" href="https://wa.me/628xxxxxx?text=Halo%20KNiverse%2C%20saya%20butuh%20bantuan%20terkait%20website%20(atau%20pertanyaan%20lain):%20">
+  {{-- <a class="wa-btn" id="waBtn" href="https://wa.me/628xxxxxx?text=Halo%20KNiverse%2C%20saya%20butuh%20bantuan%20terkait%20website%20(atau%20pertanyaan%20lain):%20">
     📩 Butuh Bantuan?
-  </a>
+  </a> --}}
 
   <!-- Promo popup (scroll) - sits above voucher (bottom:140px) -->
  <!--<div class="promo-popup" id="promoPopup" aria-hidden="true">

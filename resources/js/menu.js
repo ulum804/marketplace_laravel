@@ -1,4 +1,4 @@
-  let currentProduct = '';
+    let currentProduct = '';
     let currentPrice = 0;
 
     // Header scroll effect
@@ -10,6 +10,62 @@
         header.classList.remove('scrolled');
       }
     });
+
+    // Load products from API
+    async function loadProducts() {
+      try {
+        const response = await fetch('/api/products');
+        const products = await response.json();
+
+        const menuItemsContainer = document.getElementById('menuItems');
+        const loadingState = document.getElementById('loadingState');
+
+        // Remove loading state
+        if (loadingState) {
+          loadingState.remove();
+        }
+
+        // Clear existing content
+        menuItemsContainer.innerHTML = '';
+
+        // Render products
+        products.forEach(product => {
+          const menuItem = createMenuItem(product);
+          menuItemsContainer.appendChild(menuItem);
+        });
+
+      } catch (error) {
+        console.error('Error loading products:', error);
+        const menuItemsContainer = document.getElementById('menuItems');
+        menuItemsContainer.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">Gagal memuat menu. Silakan refresh halaman.</div>';
+      }
+    }
+
+    function createMenuItem(product) {
+      const menuItem = document.createElement('div');
+      menuItem.className = 'menu-item';
+
+      menuItem.innerHTML = `
+        <div class="menu-details">
+          <div class="menu-image-wrapper">
+            <img src="${product.gambar}" alt="${product.nama_produk}" onerror="this.src='/image/placeholder.jpg'">
+          </div>
+          <div class="menu-text-content">
+            <h4>${product.nama_produk}</h4>
+            <p>${product.deskripsi}</p>
+            <div class="menu-price">Rp ${product.harga.toLocaleString('id-ID')}</div>
+          </div>
+        </div>
+        <div class="menu-actions">
+          <button class="cart-btn" onclick="openModal('${product.nama_produk}', '${product.gambar}', '${product.deskripsi}', ${product.harga})">🛒</button>
+        </div>
+      `;
+
+      return menuItem;
+    }
+
+    // Load products when page loads
+    document.addEventListener('DOMContentLoaded', loadProducts);
 
     function openModal(productName, imageSrc, description, price) {
       currentProduct = productName;

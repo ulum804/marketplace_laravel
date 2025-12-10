@@ -35,7 +35,28 @@
         <div class="card">
           <h2>🍽️ Menu Kami</h2>
           <p style="color:var(--muted);font-size:14px;margin-bottom:16px">Pilih menu yang ingin Anda pesan</p>
-          <div class="menu-list" id="menuList"></div>
+          <div class="menu-list" id="">
+                @foreach ($produk as $item)
+                  <div class="menu-item">
+                    <div class="menu-details">
+                      {{-- <div class="menu-image-wrapper"> 
+                        <img src="{{ $item->gambar }}"  alt="gambar">
+                      </div> --}}
+                      <div class="menu-image-wrapper">
+                        <img src="/{{ $item->gambar }}" alt="{{ $item->nama_produk }}" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
+                      </div>
+                      <div class="menu-text-content">
+                        <h4>{{ $item->nama_produk }}</h4>
+                        <p>{{ $item->deskripsi }}</p>
+                        <div class="menu-price">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
+                      </div>
+                    </div>
+                    <div class="menu-actions">
+                      <button class="cart-btn" onclick="addToCart('{{ $item->nama_produk }}', {{ $item->harga }}, '{{ $item->deskripsi }}')">🛒</button>
+                    </div>
+                  </div>
+                @endforeach
+          </div>
         </div>
       </section>
 
@@ -146,20 +167,8 @@
       }
     });
 
-    const menuData = [
-      {id:'dimsum', name:'Dimsum Chili Oil', price:15000, desc:'Dimsum isi ayam udang lembut dengan chili oil khas KNiverse.'},
-      {id:'wonton', name:'Wonton Chili Oil', price:12000, desc:'Wonton lembut dengan isian daging ayam dicampur dengan udang disiram chili oil pedas gurih.'},
-      {id:'corndog', name:'Corndog Sosis Crispy', price:10000, desc:'Corndog sosis crispy luar dalam, gurihnya nagih!'},
-      {id:'risol', name:'Risol Mayo', price:14000, desc:'Risol mayo isi ayam lembut dengan saus gurih.'},
-      {id:'siomay', name:'Siomay Chili Oil', price:13000, desc:'Siomay udang segar lembut dan gurih.'},
-      {id:'enoki', name:'Jamur Enoki Crispy', price:8000, desc:'Berisi jamur enoki yang gurih dan renyah dibalut dengan saus sambal atau tomat.'},
-      {id:'tahu', name:'Tahu Bakso', price:5000, desc:'Tahu isi bakso ayam gurih berisi 2 tahu bakso yang cocok buat teman makan siang.'},
-      {id:'brownies', name:'Brownies Jumnawa', price:10000, desc:'Memiliki beberapa rasa favorit sepanjang masa, terdiri dari rasa original, strawberry, melon, oreo, milo.'}
-    ];
-    
     const formatRupiah=n=>n.toLocaleString('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0});
 
-    const menuList=document.getElementById('menuList');
     const cartList=document.getElementById('cartList');
     const cartTotal=document.getElementById('cartTotal');
     const subtotal=document.getElementById('subtotal');
@@ -167,17 +176,6 @@
     const submitBtn=document.getElementById('submitBtn');
     const popup=document.getElementById('popupQris');
     const donePay=document.getElementById('donePay');
-
-    // Tampilkan semua menu
-    menuData.forEach(m=>{
-      const el=document.createElement('div');
-      el.className='menu-item';
-      el.innerHTML=`<div class="title">${m.name}</div>
-        <div class="desc">${m.desc}</div>
-        <div class="price">${formatRupiah(m.price)}</div>
-        <button data-id="${m.id}">+ Tambah ke Keranjang</button>`;
-      menuList.appendChild(el);
-    });
 
     // Sistem keranjang dengan quantity
     let cart=[];
@@ -221,23 +219,17 @@
       cartTotal.textContent = formatRupiah(total);
     }
 
-    // Event listener untuk tombol tambah menu
-    menuList.addEventListener('click',e=>{
-      if(e.target.tagName==='BUTTON'){
-        const id=e.target.dataset.id;
-        const m=menuData.find(x=>x.id===id);
-        const existingItem = cart.find(c=>c.id===id);
-        
-        if(existingItem) {
-          existingItem.quantity += 1;
-        } else {
-          cart.push({...m, quantity: 1});
-        }
-        
-        renderCart();
-        document.querySelector('#order').scrollIntoView({behavior:'smooth'});
+    // Fungsi untuk menambah item ke keranjang
+    function addToCart(name, price, desc) {
+      const existingItem = cart.find(c => c.name === name);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({ name, price, desc, quantity: 1 });
       }
-    });
+      renderCart();
+      document.querySelector('#order').scrollIntoView({ behavior: 'smooth' });
+    }
 
     // Event listener untuk quantity controls dan hapus
     cartList.addEventListener('click',e=>{
