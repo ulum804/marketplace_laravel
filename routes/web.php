@@ -55,5 +55,7 @@ Route::get('/admin/login', function () {
     return view('admin.login');
 })->name('admin.login');
 
-// Route::post('/admin/login', [UserController::class, 'login'])->name('admin.login.post');
-Route::post('/admin/register', [UserController::class, 'register])'])->name('admin.register.post');
+Route::post('/admin/login', [UserController::class, 'login'])->name('admin.login.post');
+Route::post('/admin/register', [UserController::class, 'register'])->name('admin.register.post');
+Route::get('/admin/register', [UserController::class, 'showRegisterForm'])
+    ->name('admin.register');

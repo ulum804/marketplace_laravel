@@ -119,4 +119,9 @@ class UserController extends Controller
 
         return back()->withErrors(['email' => 'Email atau password salah.']);
     }
+
+    public function showRegisterForm()
+    {
+        return view('admin.register'); // Blade view untuk form register
+    }
 }

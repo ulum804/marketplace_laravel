@@ -683,38 +683,6 @@
   </style>
 </head>
 <body>
-  <!-- Header - sama seperti index.html -->
-  {{-- <header id="mainHeader">
-    <div class="logo">
-      <img src="asset/logoUsaha.png" alt="logo" onerror="this.style.display='none'">
-      <div>
-        <h1>KNIVERSE</h1>
-        <p>Keliling Nikmat, Penuh Rasa</p>
-      </div>
-    </div>
-
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="about.html">About Us</a>
-      <a href="menu.html">Menu</a>
-      <a href="order.html">Order</a>
-    </nav>
-
-    <div class="header-right">
-      <button class="hamburger-toggle" id="hamburgerToggle">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-    </div>
-
-    <div class="nav-menu" id="navMenu">
-      <a href="index.html">Home</a>
-      <a href="about.html">About Us</a>
-      <a href="menu.html">Menu</a>
-      <a href="order.html">Order</a>
-    </div>
-  </header> --}}
 
   <!-- Main Content -->
   <div class="auth-container">
@@ -798,18 +766,18 @@
           <button type="submit" class="submit-btn">Masuk Sekarang</button>
         </form>
 
-        <div class="divider">
+        {{-- <div class="divider">
           <span>atau masuk dengan</span>
-        </div>
+        </div> --}}
 
-        <div class="social-login">
+        {{-- <div class="social-login">
           <button class="social-btn" onclick="alert('Login dengan Google (demo)')">
             <img src="asset/google.png" alt="Google" onerror="this.style.display='none'"> Google
           </button>
           <button class="social-btn" onclick="alert('Login dengan Facebook (demo)')">
             <img src="asset/pngwing.com (1).png" alt="Facebook" onerror="this.style.display='none'"> Facebook
           </button>
-        </div>
+        </div> --}}
       </div>
 
       <!-- Register Form -->
@@ -855,14 +823,14 @@
             <label>Password</label>
             <div class="input-wrapper">
               <span class="input-icon">🔒</span>
-              <input type="password" class="form-input" id="registerPassword" name="password" placeholder="Minimal 6 karakter" required minlength="6">
+              <input type="password" class="form-input" id="registerPassword"  name="password_confirmation" placeholder="Minimal 6 karakter" required minlength="6">
               <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">
                 👁
               </button>
             </div>
           </div>
 
-          <div class="form-group">
+          {{-- <div class="form-group">
             <label>Konfirmasi Password</label>
             <div class="input-wrapper">
               <span class="input-icon">🔒</span>
@@ -871,23 +839,23 @@
                 👁
               </button>
             </div>
-          </div>
+          </div> --}}
 
           <button type="submit" class="submit-btn">Daftar Sekarang</button>
         </form>
 
-        <div class="divider">
+        {{-- <div class="divider">
           <span>atau daftar dengan</span>
-        </div>
+        </div> --}}
 
-        <div class="social-login">
+        {{-- <div class="social-login">
           <button class="social-btn" onclick="alert('Daftar dengan Google (demo)')">
             <img src="asset/google.png" alt="Google" onerror="this.style.display='none'"> Google
           </button>
           <button class="social-btn" onclick="alert('Daftar dengan Facebook (demo)')">
             <img src="asset/pngwing.com (1).png" alt="Facebook" onerror="this.style.display='none'"> Facebook
           </button>
-        </div>
+        </div> --}}
       </div>
     </div>
   </div>
