@@ -90,6 +90,29 @@
     nav a.active {
       color: var(--orange);
     }
+     nav .login-icon {
+    margin-left: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+nav .login-icon svg {
+    transition: all 0.3s ease;
+    fill: var(--dark); /* warna awal */
+}
+
+nav .login-icon:hover svg {
+    fill: var(--orange); /* ubah warna saat hover */
+    transform: scale(1.12);
+}
+
+nav .login-icon.active svg {
+    fill: var(--orange);
+}
 
     /* Best Menu Section */
     .best-menu {

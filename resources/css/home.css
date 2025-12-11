@@ -11,12 +11,110 @@
     body{margin:0;font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--dark);background:linear-gradient(180deg,#fffaf0 0%,var(--cream) 100%);-webkit-font-smoothing:antialiased}
 
     /* Header */
-    header{position:sticky;top:0;z-index:80;backdrop-filter:blur(8px);background:var(--glass);display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:3px solid rgba(255,140,66,0.06)}
-    .logo{display:flex;align-items:center;gap:12px}
-    .logo img{width:54px;height:54px;border-radius:12px;object-fit:cover;box-shadow:0 8px 24px var(--accent-shadow)}
-    .logo h1{margin:0;font-size:1.05rem;letter-spacing:0.6px}
-    nav a{margin-left:18px;text-decoration:none;color:var(--dark);font-weight:600;opacity:0.95}
-    nav a.active,nav a:hover{color:var(--orange)}
+ header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background:var(--glass);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo img {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      object-fit: cover;
+    }
+
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--dark);
+      letter-spacing: 0.5px;
+    }
+
+    .logo-text p {
+      font-size: 0.75rem;
+      margin: 0;
+      color: #666;
+      font-weight: 400;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--dark);
+      margin-left: 32px;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--orange);
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after,
+    nav a.active::after {
+      width: 100%;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--orange);
+    }
+ nav .login-icon {
+    margin-left: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+nav .login-icon svg {
+    transition: all 0.3s ease;
+    fill: var(--dark); /* warna awal */
+}
+
+nav .login-icon:hover svg {
+    fill: var(--orange); /* ubah warna saat hover */
+    transform: scale(1.12);
+}
+
+nav .login-icon.active svg {
+    fill: var(--orange);
+}
+
+
+
+
+    /* header{position:sticky;top:0;z-index:80;backdrop-filter:blur(8px);background:var(--glass);display:flex;align-items:center;justify-content:space-between;padding:12px 28px;border-bottom:3px solid rgba(255,140,66,0.06)} */
 
     /* Hero */
     .hero{display:flex;gap:36px;align-items:center;justify-content:space-between;padding:64px 6%;background:linear-gradient(90deg,var(--orange),#ff9b5a);color:white;border-radius:0 0 28px 28px}

@@ -22,18 +22,22 @@
     }
 
 
-    header {
+  header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: transparent;
       position: sticky;
       top: 0;
-      z-index: 80;
-      backdrop-filter: blur(8px);
-      background: var(--glass);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 28px;
-      border-bottom: 3px solid rgba(255,140,66,0.06);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      z-index: 50;
+      transition: all 0.3s ease;
+    }
+
+    header.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
     }
 
     .logo {
@@ -43,34 +47,35 @@
     }
 
     .logo img {
-      width: 54px;
-      height: 54px;
+      width: 50px;
+      height: 50px;
       border-radius: 12px;
       object-fit: cover;
-      box-shadow: 0 8px 24px rgba(255,140,66,0.14);
     }
 
-    .logo h1 {
-      margin: 0;
-      font-size: 1.05rem;
-      letter-spacing: 0.6px;
+    .logo-text h1 {
+      font-size: 1.5rem;
       font-weight: 700;
+      margin: 0;
+      color: var(--dark);
+      letter-spacing: 0.5px;
     }
 
-    .logo p {
+    .logo-text p {
       font-size: 0.75rem;
-      color: #666;
       margin: 0;
+      color: #666;
+      font-weight: 400;
     }
 
     nav a {
-      margin-left: 18px;
       text-decoration: none;
       color: var(--dark);
-      font-weight: 600;
-      opacity: 0.95;
+      margin-left: 32px;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: all 0.3s ease;
       position: relative;
-      transition: color 0.3s;
     }
 
     nav a::after {
@@ -81,7 +86,7 @@
       width: 0;
       height: 2px;
       background: var(--orange);
-      transition: width 0.3s;
+      transition: width 0.3s ease;
     }
 
     nav a:hover::after,
@@ -93,47 +98,29 @@
     nav a.active {
       color: var(--orange);
     }
+     nav #login-icon {
+    margin-left: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
 
-    /* Hamburger: smaller, centered, and transforms to a perfect X */
-    .hamburger-toggle{
-      display:none;
-      background:none;
-      border:none;
-      cursor:pointer;
-      position:relative;
-      width:36px;
-      height:32px;
-      padding:6px;
-      -webkit-tap-highlight-color: transparent;
-      transition:opacity 0.18s ease;
-    }
+nav #login-icon svg {
+    transition: all 0.3s ease;
+    fill: var(--dark); /* warna awal */
+}
 
-    .hamburger-toggle span{
-      display:block;
-      position:absolute;
-      left:50%;
-      transform:translateX(-50%);
-      width:22px;
-      height:2px;
-      background:var(--dark);
-      border-radius:2px;
-      transition:transform 0.28s cubic-bezier(.2,.8,.2,1),opacity 0.18s ease,background 0.18s;
-      transform-origin:center;
-    }
+nav #login-icon:hover svg {
+    fill: var(--orange); /* ubah warna saat hover */
+    transform: scale(1.12);
+}
 
-    .hamburger-toggle span:nth-child(1){ top:8px }
-    .hamburger-toggle span:nth-child(2){ top:15px }
-    .hamburger-toggle span:nth-child(3){ top:22px }
-
-    .hamburger-toggle.active span:nth-child(1){ transform: translateX(-50%) translateY(7px) rotate(45deg) }
-    .hamburger-toggle.active span:nth-child(2){ opacity:0; transform: translateX(-50%) scaleX(0) }
-    .hamburger-toggle.active span:nth-child(3){ transform: translateX(-50%) translateY(-7px) rotate(-45deg) }
-
-    .nav-menu{position:absolute;top:calc(100% + 8px);right:20px;background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.15);padding:16px 0;min-width:200px;z-index:100;visibility:hidden;opacity:0;transform:translateY(-10px);transition:all 0.3s ease}
-    .nav-menu.show{visibility:visible;opacity:1;transform:translateY(0)}
-    .nav-menu a{display:block;padding:12px 20px;color:var(--dark);text-decoration:none;margin-left:0;font-weight:500;font-size:0.95rem;transition:all 0.3s ease;border-left:3px solid transparent}
-    .nav-menu a:hover,.nav-menu a.active{background:var(--light-orange);border-left-color:var(--orange);color:var(--orange)}
-    .header-right{display:flex;align-items:center;gap:8px}
+nav #login-icon.active svg {
+    fill: var(--orange);
+}
 
     /* Main Container */
     .auth-container {

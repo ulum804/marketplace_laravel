@@ -54,29 +54,25 @@ class UserController extends Controller
 
         $user = LoginModel::where('email', $request->email)->first();
 
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Log in the user (assuming UserModel implements Authenticatable or use Auth::loginUsingId)
-            // For simplicity, since UserModel is custom, we'll use session
-
-            session([
-                'user_id'   => $user->id,
-                'nama_user' => $user->nama_user,
-                'email'     => $user->email
-            ]);
-
-            session(['admin_user' => $user]);
-            return redirect('/admin')->with('success', 'Login berhasil!');
+        // Jika user tidak ditemukan atau password salah
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return back()->withErrors([
+                'email' => 'Email atau password salah.'
+            ])->withInput();
         }
 
+        // Jika berhasil → simpan session
         session([
-            'user_id' => $user->id,
+            'user_id'   => $user->id,
             'nama_user' => $user->nama_user,
-            'email' => $user->email
+            'email'     => $user->email,
         ]);
 
+        session(['admin_user' => $user]);
 
-        return back()->withErrors(['email' => 'Email atau password salah.']);
+        return redirect('/admin')->with('success', 'Login berhasil!');
     }
+
 
     // public function showRegisterForm()
     // {
