@@ -62,6 +62,15 @@
       </svg>
       Ke Website
     </div>
+
+    <div class="menu-item" onclick="window.location.href='{{ url('/login') }}'" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      Logout
+    </div>
   </aside>
 
   <!-- Main Content -->
@@ -70,16 +79,24 @@
     <div id="alert" class="alert"></div>
 
     <!-- Header -->
-    <div class="header">
-      <h1 id="pageTitle">Dashboard</h1>
-      <div class="user-info">
-        <div class="user-avatar">A</div>
-        <div>
-          <div style="font-weight: 600;">Admin KNiverse</div>
-          <div style="font-size: 0.85rem; color: #666;">Super Admin</div>
-        </div>
+ <!-- Header -->
+<div class="header">
+  <h1 id="pageTitle">Dashboard</h1>
+  <div class="user-info">
+    <div class="user-avatar">
+      {{ strtoupper(substr(session('nama_user'), 0, 1)) }}
+    </div>
+    <div>
+      <div style="font-weight: 600;">
+        {{ session('nama_user') }}
+      </div>
+      <div style="font-size: 0.85rem; color: #666;">
+        {{ session('email') }}
       </div>
     </div>
+  </div>
+</div>
+
 
     <!-- Dashboard Tab -->
     <div id="dashboardTab" class="tab-content active">

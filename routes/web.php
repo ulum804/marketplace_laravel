@@ -34,9 +34,9 @@ Route::post('/market/order', [ProdukController::class, 'index'])->name('market.o
 // Public product routes for menu page
 Route::get('/api/products', [ProdukController::class, 'index'])->name('api.products');
 
-Route::get('/admin', function () {
-    return view('admin.admin');
-});
+// Route::get('/admin', function () {
+//     return view('admin.admin');
+// });
 Route::get('/admin', [TokoController::class, 'index'])->name('admin.admin');
 Route::delete('/admin/orders/{id}', [TokoController::class, 'destroy'])->name('admin.orders.destroy');
 
@@ -47,15 +47,16 @@ Route::get('/admin/products/{id}', [ProdukController::class, 'show'])->name('adm
 Route::put('/admin/products/{id}', [ProdukController::class, 'update'])->name('admin.products.update');
 Route::delete('/admin/products/{id}', [ProdukController::class, 'destroy'])->name('admin.products.destroy');
 
-Route::get('/login', function () {
-    return view('admin.login');
-});
+// Route::get('/login', function () {
+//     return view('admin.login');
+// });
 
-Route::get('/admin/login', function () {
+Route::get('/login', function () {
     return view('admin.login');
 })->name('admin.login');
 
-Route::post('/admin/login', [UserController::class, 'login'])->name('admin.login.post');
-Route::post('/admin/register', [UserController::class, 'register'])->name('admin.register.post');
-Route::get('/admin/register', [UserController::class, 'showRegisterForm'])
-    ->name('admin.register');
+Route::post('login', [UserController::class, 'login'])->name('admin.login.post');
+
+Route::post('register', [UserController::class, 'store'])->name('admin.register.post');
+// Route::get('/admin/register', [UserController::class, 'showRegisterForm'])
+//     ->name('admin.register');
