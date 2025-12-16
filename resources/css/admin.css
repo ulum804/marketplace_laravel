@@ -549,3 +549,85 @@
         grid-template-columns: 1fr;
       }
     }
+    /* ===== VOUCHERS LAYOUT FINAL ===== */
+/* ================= VOUCHER TAB ================= */
+
+/* ===== VOUCHERS LAYOUT FINAL ===== */
+
+#vouchersTab .form-section {
+  padding: 24px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: 20px;
+}
+
+/* MAIN ROW - balik urutan agar form di kanan, list di kiri */
+.vouchers-row {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* LEFT FORM - dorong ke kanan dengan margin-left */
+.form-col {
+  flex: 0 0 340px;
+  max-width: 340px;
+}
+
+/* RIGHT LIST */
+.list-col {
+  flex: 1;
+  min-width: 360px;
+}
+
+/* FORM INPUT FIX */
+.form-group input,
+.form-group select {
+  width: 100%;
+}
+
+/* HEADER */
+.voucher-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* LIST */
+#adminVoucherList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* CARD */
+.voucher-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0,0,0,.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* BUTTON */
+.btn-add-voucher {
+  padding: 10px 14px;
+  border-radius: 12px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .vouchers-row {
+    flex-direction: column;
+  }
+
+  .form-col,
+  .list-col {
+    max-width: 100%;
+  }
+}

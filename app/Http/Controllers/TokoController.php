@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TokoModel;
 use App\Models\ProdukModel;
+use App\Models\VoucherModel;
 use Illuminate\Http\Request;
 use Exception;
 
@@ -19,7 +20,8 @@ class TokoController extends Controller
         if (request()->ajax()) {
             return response()->json($toko);
         }
-        return view('admin.admin', compact('toko'));
+        $vouchers = VoucherModel::orderBy('created_at', 'desc')->get();
+        return view('admin.admin', compact('toko','vouchers'));
         // $buku = Buku::all();
         // print_r($buku);
         // return view('buku.index', compact('buku'))

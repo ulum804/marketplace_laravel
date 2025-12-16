@@ -53,6 +53,14 @@
       </svg>
       Tambah Produk
     </div>
+    <div class="menu-item" onclick="switchTab('vouchers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 4h16v2H4z"></path>
+        <path d="M4 12h16v8H4z"></path>
+        <line x1="4" y1="9" x2="20" y2="9"></line>
+      </svg>
+      Kelola Voucher
+    </div>
 
     <div class="menu-item" onclick="window.location.href='{{ url('/market/home') }}'" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -63,7 +71,7 @@
       Ke Website
     </div>
 
-    <div class="menu-item" onclick="window.location.href='{{ url('/login') }}'" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+    <div class="menu-item" onclick="window.location.href='{{ url('/admin/login') }}'" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
         <polyline points="16 17 21 12 16 7"></polyline>
@@ -74,167 +82,352 @@
   </aside>
 
   <!-- Main Content -->
-  <main class="main-content">
-    <!-- Alert -->
-    <div id="alert" class="alert"></div>
+<main class="main-content">
+  <!-- Alert -->
+  <div id="alert" class="alert"></div>
 
-    <!-- Header -->
- <!-- Header -->
-<div class="header">
-  <h1 id="pageTitle">Dashboard</h1>
-  <div class="user-info">
-    <div class="user-avatar">
-      {{ strtoupper(substr(session('nama_user'), 0, 1)) }}
-    </div>
-    <div>
-      <div style="font-weight: 600;">
-        {{ session('nama_user') }}
+  <!-- Header -->
+  <div class="header">
+    <h1 id="pageTitle">Dashboard</h1>
+
+    <div class="user-info">
+      <div class="user-avatar">
+        {{ strtoupper(substr(session('nama_user'), 0, 1)) }}
       </div>
-      <div style="font-size: 0.85rem; color: #666;">
-        {{ session('email') }}
+
+      <div>
+        <div style="font-weight: 600;">
+          {{ session('nama_user') }}
+        </div>
+        <div style="font-size: 0.85rem; color: #666;">
+          {{ session('email') }}
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- ================= Dashboard Tab ================= -->
+  <div id="dashboardTab" class="tab-content active">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Produk</h3>
+        <div class="value" id="totalProducts">0</div>
+        <div class="trend">↑ Aktif</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Total Pesanan</h3>
+        <div class="value" id="totalOrders">0</div>
+        <div class="trend">↑ Semua waktu</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Pesanan Hari Ini</h3>
+        <div class="value" id="todayOrders">0</div>
+        <div class="trend">↑ Hari ini</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Total Pendapatan</h3>
+        <div class="value" id="totalRevenue">Rp 0</div>
+        <div class="trend">↑ Semua waktu</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 style="margin-bottom: 15px; color: var(--orange);">Aktivitas Terbaru</h3>
+      <div id="recentActivity">
+        <p style="color: #666;">Memuat aktivitas...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= Products Tab ================= -->
+  <div id="productsTab" class="tab-content">
+    <div style="margin-bottom: 20px;">
+      <button class="btn btn-primary" onclick="switchTab('addproduct')">
+        + Tambah Produk Baru
+      </button>
+    </div>
+
+    <div class="product-grid" id="productList">
+      <!-- Products loaded here -->
+    </div>
+  </div>
+
+  <!-- ================= Orders Tab ================= -->
+  <div id="ordersTab" class="tab-content">
+    <div class="orders-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Produk</th>
+            <th>Alamat</th>
+            <th>Catatan</th>
+            <th>Total</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+          @foreach ($toko as $item)
+            <tr data-id="{{ $item->id }}">
+              <td>{{ $item->nama }}</td>
+              <td>{{ $item->produk }}</td>
+              <td>{{ $item->alamat }}</td>
+              <td>{{ $item->catatan }}</td>
+              <td>{{ number_format($item->total, 0, ',', '.') }}</td>
+              <td>
+                <button class="btn btn-delete" onclick="deleteOrder({{ $item->id }})">
+                  Hapus
+                </button>
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ================= Add Product Tab ================= -->
+  <div id="addproductTab" class="tab-content">
+    <div class="form-section">
+      <h3 style="margin-bottom: 20px; color: var(--orange);">Tambah Produk Baru</h3>
+
+      <form id="addProductForm">
+        <div class="form-group">
+          <label>Nama Produk *</label>
+          <input type="text" id="productName" required placeholder="Contoh: Dimsum Chili Oil">
+        </div>
+
+        <div class="form-group">
+          <label>Deskripsi *</label>
+          <textarea id="productDesc" required placeholder="Deskripsi produk..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Harga (Rp) *</label>
+          <input type="number" id="productPrice" required min="0" placeholder="15000">
+        </div>
+
+        <div class="form-group">
+          <label>Upload Gambar *</label>
+          <input
+            type="file"
+            id="productImageFile"
+            accept="image/*"
+            required
+            onchange="previewImageUpload()"
+          >
+
+          <div class="image-preview" id="imagePreview">
+            <div class="image-preview-text">
+              Preview gambar akan muncul di sini
+            </div>
+          </div>
+
+          <input type="hidden" id="productImage" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Simpan Produk</button>
+        <button
+          type="button"
+          class="btn"
+          style="background: var(--gray); margin-left: 10px;"
+          onclick="resetForm()"
+        >
+          Reset Form
+        </button>
+      </form>
+    </div>
+  </div>
+  <!-- ================= Vouchers Tab ================= -->
+  <div id="vouchersTab" class="tab-content">
+    <div class="form-section">
+      {{-- <h3 style="margin-bottom: 16px; color: var(--orange);">Kelola Voucher</h3> --}}
+
+      <div class="vouchers-row">
+        <!-- ===== Form Tambah Voucher ===== -->
+        <div class="form-col">
+          <form id="addVoucherForm">
+            <div class="form-group">
+              <label>Kode Voucher *</label>
+              <input
+                type="text" id="voucherCodeInput"placeholder="Contoh: GR4N_0PEN_KN1VERSE" required oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9_\-]/g, '')">
+            </div>
+
+            <div class="form-group">
+              <label>Tipe Voucher *</label>
+              <select id="voucherTypeInput" required>
+                <option value="fixed">Diskon Tetap (Rp)</option>
+                <option value="percent">Diskon Persen (%)</option>
+                <option value="freeShipping">Gratis Ongkir</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Nilai Diskon *</label>
+              <input
+                type="number"
+                id="voucherValueInput"
+                placeholder="5000 (fixed) / 10 (percent)"
+                min="0"
+                required
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Minimum Pembelian (Rp)</label>
+              <input
+                type="number"
+                id="voucherMinInput"
+                placeholder="0"
+                min="0"
+                value="0"
+              >
+            </div>
+
+            <div class="form-group">
+              <label>Batas Waktu Voucher</label>
+              <input type="datetime-local" id="voucherExpiryInput">
+            </div>
+
+            <div class="form-group">
+              <label>Deskripsi</label>
+              <input
+                type="text"
+                id="voucherDescInput"
+                placeholder="Keterangan singkat"
+              >
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              Tambah Voucher
+            </button>
+          </form>
+        </div>
+
+        <!-- ===== List Voucher Aktif ===== -->
+        <div class="list-col">
+          <div class="voucher-header">
+            <h4 style="margin: 0; color: var(--dark);">Voucher Aktif</h4>
+          </div>
+
+        <div id="adminVoucherList">
+          @forelse ($vouchers as $v)
+            <div class="voucher-card">
+              <div>
+                <div class="voucher-code">{{ $v->code }}</div>
+                <div class="voucher-desc">{{ $v->description }}</div>
+                <div class="voucher-meta">
+                  @if ($v->type === 'percent')
+                    {{ $v->value }}%
+                  @elseif ($v->type === 'freeShipping')
+                    Gratis Ongkir
+                  @else
+                    Rp {{ number_format($v->value, 0, ',', '.') }}
+                  @endif
+                  • Min: Rp {{ number_format($v->min_purchase ?? 0, 0, ',', '.') }}
+                  • Exp: {{ $v->expired_at ? $v->expired_at->format('d/m/Y H:i') : '-' }}
+                </div>
+              </div>
+
+              <div class="voucher-actions">
+                {{-- <form method="POST" action="{{ route('admin.voucher.toggle', $v->id) }}">
+                  @csrf
+                  @method('PATCH')
+                  <button type="submit">
+                    {{ $v->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                  </button>
+                </form> --}}
+                <button
+                  type="button"
+                  onclick="openEditVoucher({
+                    id: {{ $v->id }},
+                    code: '{{ $v->code }}',
+                    type: '{{ $v->type }}',
+                    value: {{ $v->value }},
+                    min_purchase: {{ $v->min_purchase ?? 0 }},
+                    description: '{{ $v->description }}',
+                    expired_at: '{{ $v->expired_at }}'
+                  })">Edit
+                </button>
+
+                  <form method="POST" action="{{ route('admin.voucher.destroy', $v->id) }}"
+                        onsubmit="return confirm('Yakin hapus voucher ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit">Hapus</button>
+                  </form>
+
+                <form method="PUT" action="{{ route('admin.voucher.update', $v->id) }}">
+                  @csrf
+                   @method('PUT')
+                  <button type="submit">editrrr</button>
+                </form>
+              </div>
+            </div>
+          @empty
+            <p style="color:#666;">Belum ada voucher</p>
+          @endforelse
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+{{-- =================== Edit Voucher Modal ================= --> --}}
+<div id="editVoucher" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Voucher</h2>
+      <button class="close-modal" onclick="closeEditVoucher()">&times;</button>
+    </div>
+
+    <form id="editVoucherForm">
+      <div class="form-group">
+        <label>Kode Voucher</label>
+        <input type="text" name="code" id="editCode" required>
+      </div>
+
+      <div class="form-group">
+        <label>Tipe</label>
+        <select name="type" id="editType">
+          <option value="fixed">Fixed</option>
+          <option value="percent">Percent</option>
+          <option value="freeShipping">Gratis Ongkir</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Nilai</label>
+        <input type="number" name="value" id="editValue" required>
+      </div>
+
+      <div class="form-group">
+        <label>Minimal Pembelian</label>
+        <input type="number" name="min_purchase" id="editMin">
+      </div>
+
+      <div class="form-group">
+        <label>Tanggal Kadaluarsa</label>
+        <input type="datetime-local" name="expired_at" id="editExpired">
+      </div>
+
+      <div class="form-group">
+        <label>Deskripsi</label>
+        <input type="text" name="description" id="editDesc">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Simpan</button>
+      <button type="button" onclick="closeEditVoucher()">Batal</button>
+    </form>
+  </div>
 </div>
 
-
-    <!-- Dashboard Tab -->
-    <div id="dashboardTab" class="tab-content active">
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Total Produk</h3>
-          <div class="value" id="totalProducts">0</div>
-          <div class="trend">↑ Aktif</div>
-        </div>
-
-        <div class="stat-card">
-          <h3>Total Pesanan</h3>
-          <div class="value" id="totalOrders">0</div>
-          <div class="trend">↑ Semua waktu</div>
-        </div>
-
-        <div class="stat-card">
-          <h3>Pesanan Hari Ini</h3>
-          <div class="value" id="todayOrders">0</div>
-          <div class="trend">↑ hari ini</div>
-        </div>
-
-        <div class="stat-card">
-          <h3>Total Pendapatan</h3>
-          <div class="value" id="totalRevenue">Rp 0</div>
-          <div class="trend">↑ Semua waktu</div>
-        </div>
-      </div>
-
-      <div class="form-section">
-        <h3 style="margin-bottom: 15px; color: var(--orange);">Aktivitas Terbaru</h3>
-        <div id="recentActivity">
-          <p style="color: #666;">Memuat aktivitas...</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Products Tab -->
-    <div id="productsTab" class="tab-content">
-      <div style="margin-bottom: 20px;">
-        <button class="btn btn-primary" onclick="switchTab('addproduct')">+ Tambah Produk Baru</button>
-      </div>
-
-      <div class="product-grid" id="productList">
-        <!-- Products will be loaded here -->
-      </div>
-    </div>
-
-    <!-- Orders Tab -->
-    <div id="ordersTab" class="tab-content">
-      {{-- <div class="bulk-actions" id="bulkActionsContainer" style="display: none;">
-        <span class="bulk-actions-info" id="selectedCountInfo">0 pesanan dipilih</span>
-        <button type="button" class="btn btn-secondary" onclick="selectAllOrders()">Pilih Semua</button>
-        <button type="button" class="btn btn-secondary" onclick="deselectAllOrders()">Batalkan Pilihan</button>
-        <button type="button" class="btn btn-danger" id="deleteSelectedBtn" onclick="deleteSelectedOrders()" disabled>Hapus Pilihan</button>
-      </div> --}}
-      <div class="orders-table">
-        <table>
-          <thead>
-            <tr>
-              {{-- <th style="width: 30px;">
-                <input type="checkbox" id="selectAllCheckbox" class="order-checkbox" onchange="toggleSelectAll(this)">
-              </th> --}}
-              <th>Nama</th>
-              <th>produk</th>
-              <th>Alamat</th>
-              <th>catatan</th>
-              <th>Total</th>
-              <th>Aksi</th>
-              {{-- <th>Tanggal</th>
-              <th>Metode Kirim</th>
-              <th>Bayar</th> --}}
-            </tr>
-          </thead>
-          {{-- <tbody id="ordersList"> --}
-          {{-- </tbody> --}}
-          <tbody id="ordersTableBody">
-            @foreach ($toko as $item )
-              <tr data-id="{{ $item->id }}">
-                {{-- <td><input type="" class="" data-index="{{ $loop->index }}" onchange="updateBulkActionsUI()"></td> --}}
-                <td>{{ $item->nama }}</td>
-                <td>{{ $item->produk }}</td>
-                <td>{{ $item->alamat }}</td>
-                <td>{{ $item->catatan }}</td>
-                <td>{{ number_format($item->total, 0, ',', '.') }}</td>
-                <td>
-                  <button class="btn btn-delete" onclick="deleteOrder({{ $item->id }})">Hapus</button>
-                </td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Add Product Tab -->
-    <div id="addproductTab" class="tab-content">
-      <div class="form-section">
-        <h3 style="margin-bottom: 20px; color: var(--orange);">Tambah Produk Baru</h3>
-        
-        <form id="addProductForm">
-          <div class="form-group">
-            <label>Nama Produk *</label>
-            <input type="text" id="productName" required placeholder="Contoh: Dimsum Chili Oil">
-          </div>
-
-          <div class="form-group">
-            <label>Deskripsi *</label>
-            <textarea id="productDesc" required placeholder="Deskripsi produk..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>Harga (Rp) *</label>
-            <input type="number" id="productPrice" required placeholder="15000" min="0">
-          </div>
-
-          <div class="form-group">
-            <label>Upload Gambar *</label>
-            <input type="file" id="productImageFile" accept="image/*" required onchange="previewImageUpload()">
-            <div class="image-preview" id="imagePreview">
-              <div class="image-preview-text">Preview gambar akan muncul di sini</div>
-            </div>
-            <input type="hidden" id="productImage" required>
-          </div>
-
-          {{-- <div class="form-group">
-            <label>ID Produk (otomatis) *</label>
-            <input type="text" id="productId" required placeholder="dimsum-chili-oil" oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9-]/g, '')">
-          </div> --}}
-
-          <button type="submit" class="btn btn-primary">Simpan Produk</button>
-          <button type="button" class="btn" style="background: var(--gray); margin-left: 10px;" onclick="resetForm()">Reset Form</button>
-        </form>
-      </div>
-    </div>
-  </main>
-
-  <!-- Edit Product Modal -->
+<!-- ================= Edit Product Modal ================= -->
   <div id="editModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -244,7 +437,7 @@
 
       <form id="editProductForm">
         <input type="hidden" id="editProductIndex">
-        
+
         <div class="form-group">
           <label>Nama Produk</label>
           <input type="text" id="editProductName" required>
@@ -262,10 +455,19 @@
 
         <div class="form-group">
           <label>Upload Gambar</label>
-          <input type="file" id="editProductImageFile" accept="image/*" onchange="previewEditImageUpload()">
+          <input
+            type="file"
+            id="editProductImageFile"
+            accept="image/*"
+            onchange="previewEditImageUpload()"
+          >
+
           <div class="image-preview" id="editImagePreview">
-            <div class="image-preview-text">Preview gambar akan muncul di sini</div>
+            <div class="image-preview-text">
+              Preview gambar akan muncul di sini
+            </div>
           </div>
+
           <input type="hidden" id="editProductImage" required>
         </div>
 
@@ -278,67 +480,11 @@
       </form>
     </div>
   </div>
+
 {{-- 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 <script>
-    // LocalStorage keys - SHARED WITH MENU & ORDER
-    // const PRODUCTS_KEY = 'kniverse_admin_products';
-    // const ORDERS_KEY = 'kniverse_admin_orders';
-
-    // Initialize with sample data if empty
-    // function initSampleData() {
-    //   const existing = getProducts();
-    //   if (existing.length === 0) {
-    //     const sampleProducts = [
-    //       {id:'dimsum', name:'Dimsum Chili Oil', price:15000, desc:'Dimsum isi ayam udang lembut dengan chili oil khas KNiverse.', image:'asset/dimsumhome.jpg'},
-    //       {id:'wonton', name:'Wonton Chili Oil', price:12000, desc:'Wonton lembut dengan isian daging ayam dicampur dengan udang disiram chili oil pedas gurih.', image:'asset/wontonmenu.jpeg'},
-    //       {id:'corndog', name:'Corndog Sosis Crispy', price:10000, desc:'Corndog sosis crispy luar dalam, gurihnya nagih!', image:'asset/corndoghome.jpg'},
-    //       {id:'risol', name:'Risol Mayo', price:14000, desc:'Risol mayo isi ayam lembut dengan saus gurih.', image:'asset/gallery2.png'},
-    //       {id:'siomay', name:'Siomay Chili Oil', price:13000, desc:'Siomay udang segar lembut dan gurih.', image:'asset/gallery2.png'},
-    //       {id:'enoki', name:'Jamur Enoki Crispy', price:8000, desc:'Berisi jamur enoki yang gurih dan renyah dibalut dengan saus sambal atau tomat.', image:'asset/gallery2.png'},
-    //       {id:'tahu', name:'Tahu Bakso', price:5000, desc:'Tahu isi bakso ayam gurih berisi 2 tahu bakso yang cocok buat teman makan siang.', image:'asset/gallery2.png'},
-    //       {id:'brownies', name:'Brownies Jumnawa', price:10000, desc:'Memiliki beberapa rasa favorit sepanjang masa, terdiri dari rasa original, strawberry, melon, oreo, milo.', image:'asset/gallery2.png'}
-    //     ];
-    //     saveProducts(sampleProducts);
-    //   }
-    // }
-
-    // Products CRUD
-    // function getProducts() {
-    //   try {
-    //     const data = localStorage.getItem(PRODUCTS_KEY);
-    //     return data ? JSON.parse(data) : [];
-    //   } catch (e) {
-    //     return [];
-    //   }
-    // }
-
-    // function saveProducts(products) {
-    //   try {
-    //     localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-    //   } catch (e) {
-    //     console.error('Error saving products:', e);
-    //   }
-    // }
-
-    // function addProduct(product) {
-    //   const products = getProducts();
-    //   products.push(product);
-    //   saveProducts(products);
-    // }
-
-    // function updateProduct(index, product) {
-    //   const products = getProducts();
-    //   products[index] = product;
-    //   saveProducts(products);
-    // }
-
-    // function deleteProduct(index) {
-    //   const products = getProducts();
-    //   products.splice(index, 1);
-    //   saveProducts(products);
-    // }
-
+   
     // Orders functions
     async function getOrders() {
       try {
@@ -391,14 +537,16 @@
         'dashboard': 'dashboardTab',
         'products': 'productsTab',
         'orders': 'ordersTab',
-        'addproduct': 'addproductTab'
+        'addproduct': 'addproductTab',
+        'vouchers': 'vouchersTab'
       };
 
       const titleMap = {
         'dashboard': 'Dashboard',
         'products': 'Kelola Produk',
         'orders': 'Kelola Pesanan',
-        'addproduct': 'Tambah Produk'
+        'addproduct': 'Tambah Produk',
+        'vouchers': 'Kelola Voucher'
       };
 
       document.getElementById(tabMap[tabName]).classList.add('active');
@@ -577,6 +725,54 @@
       document.getElementById('editModal').classList.remove('active');
     }
 
+    function openEditVoucher(voucher) {
+      console.log('Opening edit voucher modal for:', voucher);
+      document.getElementById('editCode').value = voucher.code;
+      document.getElementById('editType').value = voucher.type;
+      document.getElementById('editValue').value = voucher.value;
+      document.getElementById('editMin').value = voucher.min_purchase || 0;
+      document.getElementById('editDesc').value = voucher.description || '';
+      document.getElementById('editExpired').value = voucher.expired_at ? new Date(voucher.expired_at).toISOString().slice(0, 16) : '';
+      
+      const form = document.getElementById('editVoucherForm');
+      form.action = `/admin/voucher/${voucher.id}`;
+      
+      document.getElementById('editVoucher').classList.add('active');
+    }
+
+    function closeEditVoucher() {
+      document.getElementById('editVoucher').classList.remove('active');
+    }
+
+    document.getElementById('editVoucherForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData);
+      
+      try {
+        const response = await fetch(this.action, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          showAlert('✅ Voucher berhasil diperbarui');
+          closeEditVoucher();
+          renderAdminVouchers();
+        } else {
+          showAlert('❌ Gagal memperbarui voucher', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating voucher:', error);
+        showAlert('Terjadi kesalahan saat memperbarui voucher', 'error');
+      }
+    });
+
     document.getElementById('editProductForm').addEventListener('submit', async function(e) {
       e.preventDefault();
 
@@ -740,48 +936,6 @@
       }
     }
 
-    // Bulk selection functions
-    function toggleSelectAll(checkbox) {
-      const checkboxes = document.querySelectorAll('.order-item-checkbox');
-      checkboxes.forEach(cb => cb.checked = checkbox.checked);
-      updateBulkActionsUI();
-    }
-
-    function selectAllOrders() {
-      document.querySelectorAll('.order-item-checkbox').forEach(cb => cb.checked = true);
-      document.getElementById('selectAllCheckbox').checked = true;
-      updateBulkActionsUI();
-    }
-
-    function deselectAllOrders() {
-      document.querySelectorAll('.order-item-checkbox').forEach(cb => cb.checked = false);
-      document.getElementById('selectAllCheckbox').checked = false;
-      updateBulkActionsUI();
-    }
-
-    function updateBulkActionsUI() {
-      const selectedCheckboxes = document.querySelectorAll('.order-item-checkbox:checked');
-      const bulkContainer = document.getElementById('bulkActionsContainer');
-      const deleteBtn = document.getElementById('deleteSelectedBtn');
-      const countInfo = document.getElementById('selectedCountInfo');
-
-      if (selectedCheckboxes.length > 0) {
-        bulkContainer.style.display = 'flex';
-        deleteBtn.disabled = false;
-        countInfo.textContent = `${selectedCheckboxes.length} pesanan dipilih`;
-      } else {
-        bulkContainer.style.display = 'none';
-        deleteBtn.disabled = true;
-      }
-
-      // Update select all checkbox state
-      const allCheckboxes = document.querySelectorAll('.order-item-checkbox');
-      const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-      if (allCheckboxes.length > 0) {
-        selectAllCheckbox.checked = selectedCheckboxes.length === allCheckboxes.length && selectedCheckboxes.length > 0;
-      }
-    }
-
     function deleteOrder(id) {
       if (confirm('Apakah Anda yakin ingin menghapus pesanan ini?')) {
         fetch(`/admin/orders/${id}`, {
@@ -831,36 +985,174 @@
         });
     }
 
-    function deleteSelectedOrders() {
-      const selectedCheckboxes = document.querySelectorAll('.order-item-checkbox:checked');
-      if (selectedCheckboxes.length === 0) {
-        showAlert('Pilih pesanan yang ingin dihapus terlebih dahulu!', 'error');
+   document.getElementById('addVoucherForm').addEventListener('submit', async function(e) {e.preventDefault();
+
+    const data = {
+      code: voucherCodeInput.value,
+      type: voucherTypeInput.value,
+      value: voucherValueInput.value,
+      min_purchase: voucherMinInput.value,
+      expired_at: voucherExpiryInput.value,
+      description: voucherDescInput.value
+    };
+
+    const res = await fetch('/admin/voucher', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+      showAlert('✅ Voucher ditambahkan');
+      this.reset();
+      renderAdminVouchers();
+    } else {
+      showAlert('❌ Gagal menambahkan voucher', 'error');
+    }
+  });
+
+
+
+    async function toggleVoucher(id) {await fetch(`/admin/voucher/${id}/toggle`, {method: 'PATCH',headers: {
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+      }
+    });
+      renderAdminVouchers();
+    }
+
+   async function renderAdminVouchers() {const list = document.getElementById('adminVoucherList');
+
+      try {
+        const response = await fetch('/admin/voucher', {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        });
+
+        const vouchers = await response.json();
+
+        if (!vouchers.length) {
+          list.innerHTML = '<p style="color:#666;">Belum ada voucher</p>';
+          return;
+        }
+
+        list.innerHTML = vouchers.map(v => {
+          const exp = v.expired_at
+            ? new Date(v.expired_at).toLocaleString('id-ID')
+            : '-';
+
+          const min = 'Rp ' + (v.min_purchase ?? 0).toLocaleString('id-ID');
+
+          let valueText = '';
+          if (v.type === 'percent') valueText = v.value + '%';
+          else if (v.type === 'freeShipping') valueText = 'Gratis Ongkir';
+          else valueText = 'Rp ' + v.value.toLocaleString('id-ID');
+
+          return `
+            <div class="voucher-card">
+              <div>
+                <div class="voucher-code">${v.code}</div>
+                <div class="voucher-desc">${v.description || ''}</div>
+                <div class="voucher-meta">
+                  ${valueText} • Min: ${min} • Exp: ${exp}
+                </div>
+              </div>
+              <div class="voucher-actions">
+                <button onclick="deleteVoucher(${v.id})">Hapus</button>
+                <button onclick="openEditVoucher({
+                  id: ${v.id},
+                  code: '${v.code}',
+                  type: '${v.type}',
+                  value: ${v.value},
+                  min_purchase: ${v.min_purchase ?? 0},
+                  description: '${v.description || ''}',
+                  expired_at: '${v.expired_at || ''}'
+                })">Edit</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (e) {
+        list.innerHTML = '<p style="color:red;">Gagal memuat voucher</p>';
+      }
+    }
+
+    // Add / Edit voucher form handler
+    document.getElementById('addVoucherForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const code = document.getElementById('voucherCodeInput').value.trim().toUpperCase();
+      const type = document.getElementById('voucherTypeInput').value;
+      const value = parseInt(document.getElementById('voucherValueInput').value) || 0;
+      const minPurchase = parseInt(document.getElementById('voucherMinInput').value) || 0;
+      const expiry = document.getElementById('voucherExpiryInput').value ? new Date(document.getElementById('voucherExpiryInput').value).toISOString() : null;
+      const desc = document.getElementById('voucherDescInput').value.trim();
+
+      if (!code) {
+        showAlert('Kode voucher wajib diisi', 'error');
         return;
       }
 
-      if (confirm(`Apakah Anda yakin ingin menghapus ${selectedCheckboxes.length} pesanan terpilih?`)) {
-        const orders = getOrders();
-        const indicesToDelete = Array.from(selectedCheckboxes)
-          .map(cb => parseInt(cb.getAttribute('data-index')))
-          .sort((a, b) => b - a); // Sort descending to avoid index issues
+      const vouchers = getVouchers();
 
-        indicesToDelete.forEach(index => {
-          orders.splice(index, 1);
-        });
+      // Check if editing
+      const editingIndex = this.dataset.editing ? parseInt(this.dataset.editing) : -1;
 
-        try {
-          localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-          showAlert(`✅ ${indicesToDelete.length} pesanan berhasil dihapus!`);
-          loadOrders();
-        } catch (e) {
-          showAlert('Gagal menghapus pesanan!', 'error');
+      if (editingIndex >= 0) {
+        // update
+        vouchers[editingIndex] = {
+          code, type, discount: value, minPurchase, expiry, description: desc
+        };
+        saveVouchers(vouchers);
+        showAlert('✅ Voucher berhasil diperbarui!');
+        this.reset();
+        delete this.dataset.editing;
+      } else {
+        // new - ensure unique code
+        if (vouchers.some(v => v.code === code)) {
+          showAlert('Kode voucher sudah ada', 'error');
+          return;
         }
+        vouchers.push({ code, type, discount: value, minPurchase, expiry, description: desc });
+        saveVouchers(vouchers);
+        showAlert('✅ Voucher berhasil ditambahkan!');
+        this.reset();
       }
+
+      renderAdminVouchers();
+    });
+
+    function removeVoucherAdmin(index) {
+      if (!confirm('Hapus voucher ini?')) return;
+      const vouchers = getVouchers();
+      vouchers.splice(index, 1);
+      saveVouchers(vouchers);
+      renderAdminVouchers();
+      showAlert('✅ Voucher dihapus');
     }
+
+    async function deleteVoucher(id) {
+  if (!confirm('Hapus voucher?')) return;
+
+  await fetch(`/admin/voucher/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+    }
+  });
+
+  renderAdminVouchers();
+}
+
 
     // Initialize
     loadProducts();
     updateDashboard();
+    renderAdminVouchers();
 </script>
 </body>
 </html>

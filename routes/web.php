@@ -4,59 +4,102 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TokoController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VoucherController;
 
 Route::get('/', function () {
     return view('market.home');
 });
 
-Route::get('/market/home', function () {
-    return view('market.home');
+Route::prefix('market')->group(function () {
+
+    Route::get('/home', fn () => view('market.home'));
+    Route::get('/about', fn () => view('market.about'));
+
+    Route::get('/menu', [ProdukController::class, 'index'])
+        ->name('market.menu');
+
+    Route::get('/order', function () {
+        $produk = \App\Models\ProdukModel::all();
+        return view('market.order', compact('produk'));
+    });
+
+    Route::post('/store', [TokoController::class, 'store'])
+        ->name('market.store');
 });
-Route::get('/market/about', function () {
-    return view('market.about');
+
+Route::get('/api/products', [ProdukController::class, 'index'])
+    ->name('api.products');
+
+
+
+Route::prefix('admin')->group(function () {
+
+    /* ======================
+     |  AUTH
+     ====================== */
+    Route::get('/login', fn () => view('admin.login'))
+        ->name('admin.login');
+
+    Route::post('/login', [UserController::class, 'login'])
+        ->name('admin.login.post');
+
+    Route::get('/register', [UserController::class, 'showRegisterForm'])
+        ->name('admin.register');
+
+    Route::post('/register', [UserController::class, 'store'])
+        ->name('admin.register.post');
+
+
+    /* ======================
+     |  DASHBOARD
+     ====================== */
+    Route::get('/', [TokoController::class, 'index'])
+        ->name('admin.admin');
+
+
+    /* ======================
+     |  ORDERS
+     ====================== */
+    Route::delete('/orders/{id}', [TokoController::class, 'destroy'])
+        ->name('admin.orders.destroy');
+
+
+    /* ======================
+     |  PRODUCTS
+     ====================== */
+    Route::get('/products', [ProdukController::class, 'index'])
+        ->name('admin.products.index');
+
+    Route::post('/products', [ProdukController::class, 'store'])
+        ->name('admin.products.store');
+
+    Route::get('/products/{id}', [ProdukController::class, 'show'])
+        ->name('admin.products.show');
+
+    Route::put('/products/{id}', [ProdukController::class, 'update'])
+        ->name('admin.products.update');
+
+    Route::delete('/products/{id}', [ProdukController::class, 'destroy'])
+        ->name('admin.products.destroy');
+
+
+    /* ======================
+     |  VOUCHERS
+     ====================== */
+    Route::get('/voucher', [VoucherController::class, 'index'])
+        ->name('admin.voucher.index');
+
+    Route::post('/voucher', [VoucherController::class, 'store'])
+        ->name('admin.voucher.store');
+
+    Route::delete('/voucher/{voucher}', [VoucherController::class, 'destroy'])
+        ->name('admin.voucher.destroy');
+
+    Route::patch('/voucher/{voucher}/toggle', [VoucherController::class, 'toggle'])
+        ->name('admin.voucher.toggle');
+    Route::put('/voucher/{voucher}', [VoucherController::class, 'update'])
+    ->name('admin.voucher.update');
+
+    
+
 });
-Route::get('/market/menu', [ProdukController::class, 'index'])->name('market.menu');
-// Route::post('/market/order', function () {
-//     return view('market.order');
-
-
-
-Route::get('/market/order', function () {
-    $produk = \App\Models\ProdukModel::all();
-    return view('market.order', compact('produk'));
-});
-
-// Route::get('/market/order', [TokoController::class, 'index'])->name('market.index');
-// Route::post('/market/order', [TokoController::class, 'index'])->name('market.index');
-Route::post('/market/store', [TokoController::class, 'store'])->name('market.store');
-Route::post('/market/order', [ProdukController::class, 'index'])->name('market.order');
-
-// Public product routes for menu page
-Route::get('/api/products', [ProdukController::class, 'index'])->name('api.products');
-
-// Route::get('/admin', function () {
-//     return view('admin.admin');
-// });
-Route::get('/admin', [TokoController::class, 'index'])->name('admin.admin');
-Route::delete('/admin/orders/{id}', [TokoController::class, 'destroy'])->name('admin.orders.destroy');
-
-// Product routes
-Route::get('/admin/products', [ProdukController::class, 'index'])->name('admin.products.index');
-Route::post('/admin/products', [ProdukController::class, 'store'])->name('admin.products.store');
-Route::get('/admin/products/{id}', [ProdukController::class, 'show'])->name('admin.products.show');
-Route::put('/admin/products/{id}', [ProdukController::class, 'update'])->name('admin.products.update');
-Route::delete('/admin/products/{id}', [ProdukController::class, 'destroy'])->name('admin.products.destroy');
-
-// Route::get('/login', function () {
-//     return view('admin.login');
-// });
-
-Route::get('/login', function () {
-    return view('admin.login');
-})->name('admin.login');
-
-Route::post('login', [UserController::class, 'login'])->name('admin.login.post');
-
-Route::post('register', [UserController::class, 'store'])->name('admin.register.post');
-// Route::get('/admin/register', [UserController::class, 'showRegisterForm'])
-//     ->name('admin.register');

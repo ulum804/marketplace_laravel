@@ -229,7 +229,7 @@
         <button class="submit-btn" onclick="sendResetCode()">Kirim Kode</button>
         <button class="tab-btn" onclick="closeForgotModal()" style="background:#f5f5f5; color:#666; border-radius:12px; padding:12px;">Batal</button>
       </div>
-
+ 
       <p id="forgotMsg" style="margin-top:12px; font-weight:600;"></p>
     </div>
   </div>
