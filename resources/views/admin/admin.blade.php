@@ -18,7 +18,7 @@
       <h2>KNiverse Admin</h2>
     </div>
 
-    <div class="menu-item active" onclick="switchTab('dashboard')">
+    <div class="menu-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="3" width="7" height="7"></rect>
         <rect x="14" y="3" width="7" height="7"></rect>
@@ -28,7 +28,7 @@
       Dashboard
     </div>
 
-    <div class="menu-item" onclick="switchTab('products')">
+    <div class="menu-item" data-tab="products" onclick="switchTab('products')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="3" y1="9" x2="21" y2="9"></line>
@@ -37,7 +37,7 @@
       Produk
     </div>
 
-    <div class="menu-item" onclick="switchTab('orders')">
+    <div class="menu-item" data-tab="orders" onclick="switchTab('orders')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>
@@ -46,14 +46,14 @@
       Pesanan
     </div>
 
-    <div class="menu-item" onclick="switchTab('addproduct')">
+    <div class="menu-item" data-tab="addproduct" onclick="switchTab('addproduct')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
       </svg>
       Tambah Produk
     </div>
-    <div class="menu-item" onclick="switchTab('vouchers')">
+    <div class="menu-item" data-tab="vouchers" onclick="switchTab('vouchers')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M4 4h16v2H4z"></path>
         <path d="M4 12h16v8H4z"></path>
@@ -568,16 +568,14 @@
 
       document.getElementById(tabMap[tabName]).classList.add('active');
       document.getElementById('pageTitle').textContent = titleMap[tabName];
-
-      if (event && event.target) {
-        event.target.classList.add('active');
+      const activeMenu = document.querySelector(`.menu-item[data-tab="${tabName}"]`);
+     if (activeMenu) {
+        activeMenu.classList.add('active');
       }
 
-      if (tabName === 'products') {
-        loadProducts();
-      } else if (tabName === 'dashboard') {
-        updateDashboard();
-      }
+      // load data
+      if (tabName === 'products') loadProducts();
+      if (tabName === 'dashboard') updateDashboard();
     }
 
     // Load products
