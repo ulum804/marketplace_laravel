@@ -631,3 +631,20 @@
     max-width: 100%;
   }
 }
+
+.voucher-card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 18px rgba(0,0,0,.05);
+  display: flex;
+  flex-direction: column; /* ⬅️ kunci utama */
+  gap: 12px;
+}
+
+.voucher-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end; /* tombol ke kanan */
+}

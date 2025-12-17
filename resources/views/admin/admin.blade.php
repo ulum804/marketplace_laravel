@@ -332,7 +332,7 @@
                 </div>
               </div>
 
-              <div class="voucher-actions">
+              {{-- <div class="voucher-actions"> --}}
                 {{-- <form method="POST" action="{{ route('admin.voucher.toggle', $v->id) }}">
                   @csrf
                   @method('PATCH')
@@ -340,7 +340,7 @@
                     {{ $v->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                   </button>
                 </form> --}}
-                <button
+                {{-- <button
                   type="button"
                   onclick="openEditVoucher({
                     id: {{ $v->id }},
@@ -351,21 +351,38 @@
                     description: '{{ $v->description }}',
                     expired_at: '{{ $v->expired_at }}'
                   })">Edit
-                </button>
+                </button> --}}
 
-                  <form method="POST" action="{{ route('admin.voucher.destroy', $v->id) }}"
+                  {{-- <form method="POST" action="{{ route('admin.voucher.destroy', $v->id) }}"
                         onsubmit="return confirm('Yakin hapus voucher ini?')">
                     @csrf
                     @method('DELETE')
-                    <button type="submit">Hapus</button>
-                  </form>
+                    <button type="submit"  class="btn btn-primary">Hapu99s</button>
+                  </form> --}}
 
-                <form method="PUT" action="{{ route('admin.voucher.update', $v->id) }}">
+                {{-- <form method="PUT" action="{{ route('admin.voucher.update', $v->id) }}">
                   @csrf
                    @method('PUT')
-                  <button type="submit">editrrr</button>
-                </form>
+                  <button type="submit"  class="btn btn-primary">editrrr</button>
+                </form> --}}
+              {{-- </div> --}}
+
+              <div class="voucher-card">
+                <div class="voucher-info">
+                  <div class="voucher-code">${v.code}</div>
+                  <div class="voucher-desc">${v.description || ''}</div>
+                  <div class="voucher-meta">
+                    ${valueText} • Min: ${min} • Exp: ${exp}
+                  </div>
+                </div>
+
+                <div class="voucher-actions">
+                  <button class="btn-edit" onclick="openEditVoucher(${v.id})">Edit</button>
+                  <button class="btn-delete" onclick="deleteVoucher(${v.id})">Hapus</button>
+                </div>
               </div>
+
+
             </div>
           @empty
             <p style="color:#666;">Belum ada voucher</p>
@@ -1062,8 +1079,8 @@
                 </div>
               </div>
               <div class="voucher-actions">
-                <button onclick="deleteVoucher(${v.id})">Hapus</button>
-                <button onclick="openEditVoucher({
+                <button class="btn btn-delete" onclick="deleteVoucher(${v.id})">Hapus</button>
+                <button class="btn btn-edit" onclick="openEditVoucher({
                   id: ${v.id},
                   code: '${v.code}',
                   type: '${v.type}',
