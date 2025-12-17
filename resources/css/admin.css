@@ -641,10 +641,24 @@
   display: flex;
   flex-direction: column; /* ⬅️ kunci utama */
   gap: 12px;
+   align-items: flex-start; 
+ 
 }
 
 .voucher-actions {
   display: flex;
   gap: 10px;
-  justify-content: flex-end; /* tombol ke kanan */
+  justify-content: center;   /* ⬅️ tengah horizontal */
+  width: 100%;  
+}
+.voucher-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; 
+
+}
+.voucher-code {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--orange);
 }
