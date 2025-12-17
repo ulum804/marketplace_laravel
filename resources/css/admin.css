@@ -662,3 +662,13 @@
   font-size: 1.1rem;
   color: var(--orange);
 }
+.voucher-expired {
+  opacity: 0.6;
+  border-color: #f87171;
+}
+
+.voucher-warning {
+  color: #dc2626;
+  font-size: 20px;
+  margin-bottom: 6px;
+}

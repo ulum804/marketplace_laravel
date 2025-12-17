@@ -439,7 +439,7 @@
       </div>
 
       <button type="submit" class="btn btn-primary">Simpan</button>
-      <button type="button" onclick="closeEditVoucher()">Batal</button>
+      {{-- <button type="button" onclick="closeEditVoucher()">Batal</button> --}}
     </form>
   </div>
 </div>
@@ -766,6 +766,9 @@
       
       const formData = new FormData(this);
       const data = Object.fromEntries(formData);
+      const now = new Date();
+    const expired = v.expired_at && new Date(v.expired_at) < now;
+
       
       try {
         const response = await fetch(this.action, {
@@ -1058,6 +1061,10 @@
         }
 
         list.innerHTML = vouchers.map(v => {
+          const now = new Date();
+          const expired = v.expired_at
+            ? new Date(v.expired_at) < now
+            : false;
           const exp = v.expired_at
             ? new Date(v.expired_at).toLocaleString('id-ID')
             : '-';
@@ -1070,7 +1077,13 @@
           else valueText = 'Rp ' + v.value.toLocaleString('id-ID');
 
           return `
-            <div class="voucher-card">
+             
+            <div class="voucher-card" ${new Date(v.expired_at) < new Date() ? 'expired' : ''}">
+               ${expired ? `
+                <div class="voucher-warning" title="Voucher sudah kedaluwarsa">
+                  ⚠️
+                </div>
+              ` : ''}
               <div>
                 <div class="voucher-code">${v.code}</div>
                 <div class="voucher-desc">${v.description || ''}</div>
