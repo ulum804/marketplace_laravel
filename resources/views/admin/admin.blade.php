@@ -318,79 +318,7 @@
           </div>
 
         <div id="adminVoucherList">
-          @forelse ($vouchers as $v)
-            <div class="voucher-card">
-              <div>
-                <div class="voucher-code">{{ $v->code }}</div>
-                <div class="voucher-desc">{{ $v->description }}</div>
-                <div class="voucher-meta">
-                  @if ($v->type === 'percent')
-                    {{ $v->value }}%
-                  @elseif ($v->type === 'freeShipping')
-                    Gratis Ongkir
-                  @else
-                    Rp {{ number_format($v->value, 0, ',', '.') }}
-                  @endif
-                  • Min: Rp {{ number_format($v->min_purchase ?? 0, 0, ',', '.') }}
-                  • Exp: {{ $v->expired_at ? $v->expired_at->format('d/m/Y H:i') : '-' }}
-                </div>
-              </div>
-
-              {{-- <div class="voucher-actions"> --}}
-                {{-- <form method="POST" action="{{ route('admin.voucher.toggle', $v->id) }}">
-                  @csrf
-                  @method('PATCH')
-                  <button type="submit">
-                    {{ $v->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                  </button>
-                </form> --}}
-                {{-- <button
-                  type="button"
-                  onclick="openEditVoucher({
-                    id: {{ $v->id }},
-                    code: '{{ $v->code }}',
-                    type: '{{ $v->type }}',
-                    value: {{ $v->value }},
-                    min_purchase: {{ $v->min_purchase ?? 0 }},
-                    description: '{{ $v->description }}',
-                    expired_at: '{{ $v->expired_at }}'
-                  })">Edit
-                </button> --}}
-
-                  {{-- <form method="POST" action="{{ route('admin.voucher.destroy', $v->id) }}"
-                        onsubmit="return confirm('Yakin hapus voucher ini?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit"  class="btn btn-primary">Hapu99s</button>
-                  </form> --}}
-
-                {{-- <form method="PUT" action="{{ route('admin.voucher.update', $v->id) }}">
-                  @csrf
-                   @method('PUT')
-                  <button type="submit"  class="btn btn-primary">editrrr</button>
-                </form> --}}
-              {{-- </div> --}}
-
-              <div class="voucher-card">
-                <div class="voucher-info">
-                  <div class="voucher-code">${v.code}</div>
-                  <div class="voucher-desc">${v.description || ''}</div>
-                  <div class="voucher-meta">
-                    ${valueText} • Min: ${min} • Exp: ${exp}
-                  </div>
-                </div>
-
-                <div class="voucher-actions">
-                  <button class="btn-edit" onclick="openEditVoucher(${v.id})">Edit</button>
-                  <button class="btn-delete" onclick="deleteVoucher(${v.id})">Hapus</button>
-                </div>
-              </div>
-
-
-            </div>
-          @empty
-            <p style="color:#666;">Belum ada voucher</p>
-          @endforelse
+          <!-- Vouchers will be loaded here via JavaScript -->
         </div>
 
         </div>
@@ -765,13 +693,15 @@
 
     document.getElementById('editVoucherForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      
+
       const formData = new FormData(this);
       const data = Object.fromEntries(formData);
-      const now = new Date();
-    const expired = v.expired_at && new Date(v.expired_at) < now;
 
-      
+      // Convert empty string to null for expired_at
+      if (data.expired_at === '') {
+        data.expired_at = null;
+      }
+
       try {
         const response = await fetch(this.action, {
           method: 'PUT',
@@ -781,13 +711,14 @@
           },
           body: JSON.stringify(data)
         });
-        
+
         if (response.ok) {
           showAlert('✅ Voucher berhasil diperbarui');
           closeEditVoucher();
           renderAdminVouchers();
         } else {
-          showAlert('❌ Gagal memperbarui voucher', 'error');
+          const errorData = await response.json();
+          showAlert('❌ Gagal memperbarui voucher: ' + (errorData.message || 'Unknown error'), 'error');
         }
       } catch (error) {
         console.error('Error updating voucher:', error);
