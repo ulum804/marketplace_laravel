@@ -12,6 +12,8 @@ class TokoModel extends Model
         'alamat',
         'produk',
         'catatan',
-        'total'
+        'total',
+        'original_total',
+        'voucher_code'
     ];
 }

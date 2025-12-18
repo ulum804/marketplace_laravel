@@ -98,7 +98,8 @@
                   <span id="subtotal">Rp 0</span>
                 </div>
                 <div class="total-summary-row grand-total">
-                  <input type="hidden" id="total" name="total">
+                    <input type="hidden" id="subtotalInput" name="subtotal">
+                    <input type="hidden" id="total" name="total">
                   <span>Total Pembayaran:</span>
                   <span id="cartTotal">Rp 0</span>
                 </div>
@@ -282,42 +283,93 @@
       popup.classList.add('active');
     });
 
+    // helper: save pending orders to localStorage and retry later
+    const PENDING_KEY = 'kniverse_pending_orders';
+
+    function savePendingOrder(data) {
+      try {
+        const raw = localStorage.getItem(PENDING_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        arr.push(data);
+        localStorage.setItem(PENDING_KEY, JSON.stringify(arr));
+      } catch (e) { console.error('Failed to save pending order', e); }
+    }
+
+    async function sendPendingOrders() {
+      try {
+        const raw = localStorage.getItem(PENDING_KEY);
+        if (!raw) return;
+        const arr = JSON.parse(raw);
+        if (!arr.length) return;
+
+        const remaining = [];
+        for (const o of arr) {
+          try {
+            const fd = new FormData();
+            Object.keys(o).forEach(k => fd.set(k, o[k]));
+            const res = await fetch('{{ route('market.store') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 'Accept': 'application/json' }, body: fd });
+            if (!res.ok) throw new Error('Server error');
+            const j = await res.json();
+            if (!j.success) throw new Error(j.message || 'Failed');
+            // success => nothing to do
+          } catch (e) {
+            remaining.push(o);
+          }
+        }
+        if (remaining.length) localStorage.setItem(PENDING_KEY, JSON.stringify(remaining)); else localStorage.removeItem(PENDING_KEY);
+      } catch (e) { console.error('sendPendingOrders error', e); }
+    }
+
+    // try sending pending orders every 30s
+    setInterval(sendPendingOrders, 30000);
+    // attempt immediately on load
+    sendPendingOrders();
+
     donePay.addEventListener('click', async () => {
       if(!pendingOrder)return;
       const form = document.getElementById('orderForm');
-      const formData = new FormData(form);
-      formData.set('produk', pendingOrder.item);
-      formData.set('nama', pendingOrder.nama);
-      formData.set('alamat', pendingOrder.alamat);
-      formData.set('catatan', pendingOrder.catatan);
-      formData.set('total', pendingOrder.total);
+
+      // build order data object - send as JSON for reliability
+      const orderData = {
+        nama: pendingOrder.nama,
+        alamat: pendingOrder.alamat,
+        produk: pendingOrder.item,
+        catatan: pendingOrder.catatan,
+        subtotal: parseInt(pendingOrder.total),
+        total: parseInt(document.getElementById('total').value || pendingOrder.total),
+        voucher: document.getElementById('voucher').value.trim() || null
+      };
 
       try {
+        console.log('Sending order:', orderData);
         const response = await fetch(form.action, {
           method: 'POST',
           headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
             'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
           },
-          body: formData
+          body: JSON.stringify(orderData)
         });
 
-        if (!response.ok) throw new Error('Terjadi kesalahan saat menyimpan data');
-
         const data = await response.json();
+        console.log('Order response:', data, 'Status:', response.status);
 
-        if (data.success) {
+        if (response.ok && data.success) {
           alert('✅ Pembayaran diterima! Pesanan berhasil disimpan');
           pendingOrder = null;
           cart = [];
           renderCart();
           popup.classList.remove('active');
-          form.reset();
+          document.getElementById('orderForm').reset();
         } else {
-          alert('Gagal menyimpan pesanan: ' + (data.message || 'Coba lagi'));
+          const msg = data.message || data.error || 'Terjadi kesalahan saat menyimpan';
+          alert('❌ Gagal: ' + msg);
+          console.error('Server error:', data);
         }
       } catch (error) {
-        alert(error.message);
+        console.error('Fetch error:', error);
+        alert('❌ Koneksi gagal: ' + error.message);
       }
     });
 
@@ -327,18 +379,32 @@
     const VOUCHERS_KEY = 'kniverse_vouchers';
     let appliedVoucher = null;
 
-    function getVouchersFromAdmin() {
+    async function getVouchersFromAdmin() {
       try {
-        const data = localStorage.getItem(VOUCHERS_KEY);
-        return data ? JSON.parse(data) : [];
+        const res = await fetch('/admin/voucher', {
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) return [];
+        const raw = await res.json();
+        // Map backend fields to client-friendly names
+        return raw.map(v => ({
+          id: v.id,
+          code: (v.code || '').toString().toUpperCase(),
+          type: v.type,
+          value: Number(v.value || 0),
+          minPurchase: Number(v.min_purchase || 0),
+          expiry: v.expired_at || null,
+          description: v.description || '',
+          is_active: !!v.is_active
+        }));
       } catch (e) {
-        console.error('Error reading vouchers:', e);
+        console.error('Error fetching vouchers:', e);
         return [];
       }
     }
 
     // Event listener untuk input voucher
-    document.getElementById('voucher').addEventListener('change', function() {
+    document.getElementById('voucher').addEventListener('change', async function() {
       const voucherCode = this.value.trim().toUpperCase();
       
       if (!voucherCode) {
@@ -347,11 +413,11 @@
         return;
       }
 
-      const vouchers = getVouchersFromAdmin();
-      const foundVoucher = vouchers.find(v => v.code === voucherCode);
+      const vouchers = await getVouchersFromAdmin();
+      const foundVoucher = vouchers.find(v => v.code === voucherCode && v.is_active);
 
       if (!foundVoucher) {
-        alert('❌ Kode voucher tidak ditemukan!');
+        alert('❌ Kode voucher tidak ditemukan atau tidak aktif!');
         this.value = '';
         appliedVoucher = null;
         updateTotal();
@@ -393,10 +459,10 @@
 
       if (appliedVoucher) {
         if (appliedVoucher.type === 'percent') {
-          const discount = (subtotalAmount * appliedVoucher.discount) / 100;
+          const discount = (subtotalAmount * appliedVoucher.value) / 100;
           finalTotal = subtotalAmount - discount;
         } else if (appliedVoucher.type === 'fixed') {
-          finalTotal = subtotalAmount - appliedVoucher.discount;
+          finalTotal = subtotalAmount - appliedVoucher.value;
         } else if (appliedVoucher.type === 'freeShipping') {
           // FreeShipping logic bisa ditambahkan jika ada shipping cost
           finalTotal = subtotalAmount;
@@ -406,6 +472,8 @@
 
       subtotal.textContent = formatRupiah(subtotalAmount);
       cartTotal.textContent = formatRupiah(finalTotal);
+      const subtotalInput = document.getElementById('subtotalInput');
+      if (subtotalInput) subtotalInput.value = subtotalAmount;
       document.getElementById('total').value = finalTotal;
     };
   </script>
