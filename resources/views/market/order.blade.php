@@ -97,6 +97,10 @@
                   <span>Subtotal:</span>
                   <span id="subtotal">Rp 0</span>
                 </div>
+                <div class="total-summary-row" id="voucherRow" style="display:none">
+                   <span style="color:#d9534f">Potongan Voucher</span>
+                   <span style="color:#d9534f" id="voucherDiscount">- Rp 0</span>
+                 </div>
                 <div class="total-summary-row grand-total">
                     <input type="hidden" id="subtotalInput" name="subtotal">
                     <input type="hidden" id="total" name="total">
@@ -453,29 +457,40 @@
 
     // Update total dengan diskon voucher
     const originalUpdateTotal = updateTotal;
-    window.updateTotal = function() {
-      const subtotalAmount = cart.reduce((t, c) => t + (c.price * c.quantity), 0);
-      let finalTotal = subtotalAmount;
+  window.updateTotal = function() {
+  const subtotalAmount = cart.reduce((t, c) => t + (c.price * c.quantity), 0);
+  let finalTotal = subtotalAmount;
+  let discount = 0;
 
-      if (appliedVoucher) {
-        if (appliedVoucher.type === 'percent') {
-          const discount = (subtotalAmount * appliedVoucher.value) / 100;
-          finalTotal = subtotalAmount - discount;
-        } else if (appliedVoucher.type === 'fixed') {
-          finalTotal = subtotalAmount - appliedVoucher.value;
-        } else if (appliedVoucher.type === 'freeShipping') {
-          // FreeShipping logic bisa ditambahkan jika ada shipping cost
-          finalTotal = subtotalAmount;
-        }
-        finalTotal = Math.max(0, finalTotal); // Jangan negatif
-      }
+  if (appliedVoucher) {
+    if (appliedVoucher.type === 'percent') {
+      discount = (subtotalAmount * appliedVoucher.value) / 100;
+    } else if (appliedVoucher.type === 'fixed') {
+      discount = appliedVoucher.value;
+    } else if (appliedVoucher.type === 'freeShipping') {
+      discount = 0; // kalau ada ongkir nanti bisa diubah
+    }
 
-      subtotal.textContent = formatRupiah(subtotalAmount);
-      cartTotal.textContent = formatRupiah(finalTotal);
-      const subtotalInput = document.getElementById('subtotalInput');
-      if (subtotalInput) subtotalInput.value = subtotalAmount;
-      document.getElementById('total').value = finalTotal;
-    };
+    finalTotal = Math.max(0, subtotalAmount - discount);
+
+    // tampilkan baris voucher
+    document.getElementById('voucherRow').style.display = 'flex';
+    document.getElementById('voucherDiscount').textContent =
+      '- ' + formatRupiah(discount);
+
+  } else {
+    document.getElementById('voucherRow').style.display = 'none';
+  }
+
+  // update tampilan
+  subtotal.textContent = formatRupiah(subtotalAmount);
+  cartTotal.textContent = formatRupiah(finalTotal);
+
+  // kirim ke backend
+  document.getElementById('subtotalInput').value = subtotalAmount;
+  document.getElementById('total').value = finalTotal;
+};
+
   </script>
 </body>
 </html>

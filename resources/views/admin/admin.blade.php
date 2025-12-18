@@ -165,7 +165,7 @@
             <th>Produk</th>
             <th>Alamat</th>
             <th>Catatan</th>
-            <th>Subtotal</th>
+            {{-- <th>Subtotal</th> --}}
             <th>Total</th>
             <th>Voucher</th>
             <th>Aksi</th>
@@ -178,8 +178,8 @@
               <td>{{ $item->produk }}</td>
               <td>{{ $item->alamat }}</td>
               <td>{{ $item->catatan ?? '-' }}</td>
-              <td>Rp {{ number_format($item->original_total ?? $item->total, 0, ',', '.') }}</td>
-              <td style="font-weight: 600; color: var(--orange);">Rp {{ number_format($item->total, 0, ',', '.') }}</td>
+              {{-- <td>Rp {{ number_format($item->original_total ?? $item->total, 0, ',', '.') }}</td> --}}
+              <td >Rp {{ number_format($item->total, 0, ',', '.') }}</td>
               <td>{{ $item->voucher_code ? $item->voucher_code : '-' }}</td>
               <td>
                 <button class="btn btn-delete" onclick="deleteOrder({{ $item->id }})">
