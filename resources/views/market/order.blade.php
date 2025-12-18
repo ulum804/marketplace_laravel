@@ -82,6 +82,11 @@
             <label style="font-weight:600;color:var(--dark);margin-top:12px;display:block">Catatan (Opsional)
               <textarea id="custNote" name="catatan" rows="2" placeholder="Contoh: tanpa saos, level pedas sedang"></textarea>
             </label>
+            
+            <label style="font-weight:600;color:var(--dark);margin-top:12px;display:block">Masukkan Voucher
+              <input type="text" id="voucher" name="voucher" placeholder="Masukkan kode voucher jika ada">
+            </label>
+
             <div style="margin-top:20px">
               <input type="hidden" id="produk" name="produk">
               <h3 style="color:var(--orange)">🛒 Keranjang Belanja</h3>
@@ -317,6 +322,92 @@
     });
 
     renderCart();
+
+    // Voucher system - read from localStorage (set by admin)
+    const VOUCHERS_KEY = 'kniverse_vouchers';
+    let appliedVoucher = null;
+
+    function getVouchersFromAdmin() {
+      try {
+        const data = localStorage.getItem(VOUCHERS_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        console.error('Error reading vouchers:', e);
+        return [];
+      }
+    }
+
+    // Event listener untuk input voucher
+    document.getElementById('voucher').addEventListener('change', function() {
+      const voucherCode = this.value.trim().toUpperCase();
+      
+      if (!voucherCode) {
+        appliedVoucher = null;
+        updateTotal();
+        return;
+      }
+
+      const vouchers = getVouchersFromAdmin();
+      const foundVoucher = vouchers.find(v => v.code === voucherCode);
+
+      if (!foundVoucher) {
+        alert('❌ Kode voucher tidak ditemukan!');
+        this.value = '';
+        appliedVoucher = null;
+        updateTotal();
+        return;
+      }
+
+      // Check if expired
+      if (foundVoucher.expiry) {
+        const expiryDate = new Date(foundVoucher.expiry);
+        if (new Date() > expiryDate) {
+          alert('⏰ Voucher sudah expired!');
+          this.value = '';
+          appliedVoucher = null;
+          updateTotal();
+          return;
+        }
+      }
+
+      // Check minimum purchase
+      const subtotalAmount = cart.reduce((t, c) => t + (c.price * c.quantity), 0);
+      if (foundVoucher.minPurchase && subtotalAmount < foundVoucher.minPurchase) {
+        alert(`⚠️ Pembelian minimal Rp ${foundVoucher.minPurchase.toLocaleString('id-ID')} untuk voucher ini!`);
+        this.value = '';
+        appliedVoucher = null;
+        updateTotal();
+        return;
+      }
+
+      appliedVoucher = foundVoucher;
+      alert(`✅ Voucher diterima! ${foundVoucher.description || ''}`);
+      updateTotal();
+    });
+
+    // Update total dengan diskon voucher
+    const originalUpdateTotal = updateTotal;
+    window.updateTotal = function() {
+      const subtotalAmount = cart.reduce((t, c) => t + (c.price * c.quantity), 0);
+      let finalTotal = subtotalAmount;
+
+      if (appliedVoucher) {
+        if (appliedVoucher.type === 'percent') {
+          const discount = (subtotalAmount * appliedVoucher.discount) / 100;
+          finalTotal = subtotalAmount - discount;
+        } else if (appliedVoucher.type === 'fixed') {
+          finalTotal = subtotalAmount - appliedVoucher.discount;
+        } else if (appliedVoucher.type === 'freeShipping') {
+          // FreeShipping logic bisa ditambahkan jika ada shipping cost
+          finalTotal = subtotalAmount;
+        }
+        finalTotal = Math.max(0, finalTotal); // Jangan negatif
+      }
+
+      subtotal.textContent = formatRupiah(subtotalAmount);
+      cartTotal.textContent = formatRupiah(finalTotal);
+      document.getElementById('total').value = finalTotal;
+    };
   </script>
 </body>
 </html>
