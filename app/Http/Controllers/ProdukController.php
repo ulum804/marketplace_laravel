@@ -33,6 +33,7 @@ class ProdukController extends Controller
             'deskripsi' => 'required|string|max:1000',
             'harga' => 'required|integer|min:0',
             'gambar' => 'required|string', // Base64 image data
+            'kategori' => 'nullable|string|max:50',
         ]);
 
         // Decode base64 image and save to storage
@@ -50,6 +51,11 @@ class ProdukController extends Controller
 
             // Update validated data with filename
             $validated['gambar'] = 'storage/produk/' . $filename;
+        }
+
+        // Ensure kategori default
+        if (!isset($validated['kategori']) || !$validated['kategori']) {
+            $validated['kategori'] = 'utama';
         }
 
         ProdukModel::create($validated);
@@ -78,6 +84,7 @@ class ProdukController extends Controller
             'deskripsi' => 'required|string|max:1000',
             'harga' => 'required|integer|min:0',
             'gambar' => 'nullable|string',
+            'kategori' => 'nullable|string|max:50',
         ]);
 
         // Handle image update if provided

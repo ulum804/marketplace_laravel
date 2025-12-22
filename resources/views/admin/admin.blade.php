@@ -232,6 +232,69 @@
 
           <input type="hidden" id="productImage" required>
         </div>
+           <!-- paket produk -->
+            <div class="form-group">
+            <label>Kategori Produk *</label>
+            <select id="productCategory" required style="padding:12px;border:1px solid var(--border);border-radius:8px;width:100%;max-width:320px;" onchange="updateIncludesInputVisibility()">
+              <option value="andalan">⭐ Menu Andalan</option>
+              <option value="utama" selected>🍽️ Menu Utama</option>
+              <option value="secret">🎁 Secret Paket</option>
+            </select>
+            <div id="bundleCountInfo" style="display:none;margin-top:10px;padding:12px;background:#fffbf5;border-left:4px solid var(--orange);border-radius:6px;color:#666;font-size:0.9rem;">
+
+            <!-- Bundle Creation Form (hanya muncul jika pilih Secret Paket) -->
+            <div id="bundleFormSection" style="display:none;padding:16px;background:#fffbf5;border-radius:10px;border:1px solid var(--border);margin-bottom:16px;">
+              <h4 style="color:var(--orange);margin-top:0;">🎁 Buat Bundling Baru</h4>
+            
+              <div class="form-group">
+                <label>Nama Bundling *</label>
+                <input type="text" id="bundleName" placeholder="Contoh: Paket Ngecrush" oninput="this.value = this.value.replace(/[^a-zA-Z0-9\s\-]/g, '')">
+              </div>
+
+              <div class="form-group">
+                <label>Deskripsi Bundling *</label>
+                <input type="text" id="bundleDesc" placeholder="Contoh: Paket romantis untuk yang lagi ngecrush">
+              </div>
+
+              <div class="form-group">
+                <label>Diskon Bundling (%) *</label>
+                <input type="number" id="bundleDiscount" placeholder="10" min="0" max="100">
+              </div>
+
+              <div class="form-group">
+                <label>Harga Paket (Rp) *</label>
+                <input type="number" id="bundlePrice" placeholder="15000" min="0">
+              </div>
+
+              <div class="form-group">
+                <label>Upload Gambar Paket</label>
+                <input type="file" id="bundleImageFile" accept="image/*" onchange="previewBundleImageUpload()">
+                <div class="image-preview" id="bundleImagePreview">
+                  <div class="image-preview-text">Preview gambar paket akan muncul di sini</div>
+                </div>
+                <input type="hidden" id="bundleImage">
+              </div>
+
+              <div class="form-group">
+                <label>Isi Paket *</label>
+                <div id="bundleItemsContainer" style="border:1px solid var(--border);border-radius:8px;padding:12px;background:white;max-height:300px;overflow-y:auto;">
+                  <div id="bundleItemsList" style="display:flex;flex-direction:column;gap:8px;">
+                    <!-- Bundle items akan ditambahkan di sini -->
+                  </div>
+                  <button type="button" class="btn btn-primary" style="width:100%;margin-top:12px;padding:8px;font-size:0.9rem;" onclick="addBundleItemSlot()">+ Tambah Item</button>
+                </div>
+              </div>
+
+              <div class="form-group" style="background:#f5f5f5;padding:12px;border-radius:8px;border-left:4px solid var(--orange);">
+                <label style="font-weight:600;margin-bottom:8px;display:block;">📦 Preview Bundle:</label>
+                <div id="bundlePreview" style="color:#444;font-size:0.9rem;min-height:20px;background:white;padding:10px;border-radius:6px;border:1px dashed var(--border);">Belum ada item</div>
+              </div>
+
+              <button type="button" class="btn btn-primary" onclick="createBundle()" style="margin-right:8px;">✨ Buat Bundling</button>
+              <button type="button" class="btn" style="background:var(--gray);" onclick="cancelBundleForm()">Batal</button>
+            </div>
+            </div>
+          </div>
 
         <button type="submit" class="btn btn-primary">Simpan Produk</button>
         <button
@@ -592,7 +655,8 @@
         nama_produk: document.getElementById('productName').value.trim(),
         deskripsi: document.getElementById('productDesc').value.trim(),
         harga: parseInt(document.getElementById('productPrice').value),
-        gambar: document.getElementById('productImage').value.trim()
+        gambar: document.getElementById('productImage').value.trim(),
+        kategori: document.getElementById('productCategory') ? document.getElementById('productCategory').value : 'utama'
       };
 
       if (!product.nama_produk || !product.deskripsi || !product.harga || !product.gambar) {
@@ -628,6 +692,52 @@
         showAlert('Terjadi kesalahan saat menambahkan produk!', 'error');
       }
     });
+
+     // Update bundle form when category changes
+    function updateBundleForm() {
+      const category = document.getElementById('productCategory').value;
+      const bundleFormSection = document.getElementById('bundleFormSection');
+      
+      if (category === 'secret') {
+        bundleFormSection.style.display = 'block';
+        // Jika belum ada item, tambahkan satu slot default
+        if (!bundleItems || bundleItems.length === 0) {
+          addBundleItemSlot();
+        } else {
+          renderBundleItems();
+        }
+      } else {
+        bundleFormSection.style.display = 'none';
+        cancelBundleForm();
+      }
+    }
+
+    // Show/hide the includes input when category changes
+    function updateIncludesInputVisibility() {
+      const categoryEl = document.getElementById('productCategory');
+      if (!categoryEl) return;
+      // For secret category, bundle form section akan ditampilkan otomatis via updateBundleForm
+      // Also show the outer wrapper that contains the bundle form
+      const wrapper = document.getElementById('bundleCountInfo');
+      if (wrapper) {
+        if (categoryEl.value === 'secret') wrapper.style.display = 'block';
+        else wrapper.style.display = 'none';
+      }
+      // Toggle normal product fields and outer buttons
+      const normal = document.getElementById('normalProductFields');
+      const saveBtn = document.getElementById('saveProductBtn');
+      const resetBtn = document.getElementById('resetProductBtn');
+      if (categoryEl.value === 'secret') {
+        if (normal) normal.style.display = 'none';
+        if (saveBtn) saveBtn.style.display = 'none';
+        if (resetBtn) resetBtn.style.display = 'none';
+      } else {
+        if (normal) normal.style.display = 'block';
+        if (saveBtn) saveBtn.style.display = 'inline-block';
+        if (resetBtn) resetBtn.style.display = 'inline-block';
+      }
+      updateBundleForm();
+    }
 
     // Edit product
     async function openEditModal(id) {

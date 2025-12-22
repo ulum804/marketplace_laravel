@@ -11,6 +11,7 @@ class ProdukModel extends Model
         'nama_produk',
         'deskripsi',
         'harga',
-        'gambar'
+        'gambar',
+        'kategori'
     ];
 }

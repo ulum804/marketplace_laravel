@@ -65,9 +65,16 @@
   <section class="menu-list">
     <h2>Menu Kami</h2>
     <p class="menu-subtitle">Pilihan menu terbaik dengan cita rasa yang menggugah selera</p>
+    <!-- Menu Filter Buttons -->
+    <div class="menu-filter-buttons">
+      <button class="filter-btn active" onclick="filterMenu('semua')">📋 Semua Menu</button>
+      <button class="filter-btn" onclick="filterMenu('andalan')">⭐ Menu Andalan</button>
+      <button class="filter-btn" onclick="filterMenu('utama')">🍽️ Menu Utama</button>
+      <button class="filter-btn" onclick="filterMenu('secret')">🎁 Secret Paket</button>
+    </div>
     <div class="menu-items">
       @foreach ($produk as $item)
-      <div class="menu-item">
+      <div class="menu-item" data-category="{{ $item->kategori ?? 'utama' }}">
         <div class="menu-details">
           <div class="menu-image-wrapper">
              <img src="/{{ $item->gambar }}" alt="{{ $item->nama_produk }}" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
@@ -78,9 +85,9 @@
             <div class="menu-price">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
           </div>
         </div>
-        {{-- <div class="menu-actions">
-          <button class="cart-btn" onclick="openModal('{{ $item->nama_produk }}', '{{ asset('image/' . $item->gambar) }}', '{{ $item->deskripsi }}', {{ $item->harga }})">🛒</button>
-        </div> --}}
+        <div class="menu-actions">
+          <button class="cart-btn" onclick="addToCart({{ $item->id }}, {!! json_encode($item->nama_produk) !!}, {!! json_encode('/' . $item->gambar) !!}, {{ $item->harga }})">🛒</button>
+        </div>
       </div>
       @endforeach
     </div>
@@ -185,6 +192,39 @@
         let currentProduct = '';
     let currentPrice = 0;
 
+        // Filter menu by category (semua, andalan, utama, secret)
+        function filterMenu(category) {
+          // toggle active class on buttons
+          document.querySelectorAll('.menu-filter-buttons .filter-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('onclick')?.includes("filterMenu('" + category + "')"));
+          });
+
+          const items = document.querySelectorAll('.menu-items .menu-item');
+          items.forEach(item => {
+            const cat = (item.getAttribute('data-category') || 'utama').toLowerCase();
+            if (category === 'semua' || cat === category.toLowerCase()) {
+              item.style.display = '';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        }
+
+        // Add product to local order cart and redirect to order page
+        function addToCart(id, name, image, price) {
+          try {
+            const existing = localStorage.getItem('orderDataArray');
+            const arr = existing ? JSON.parse(existing) : [];
+            arr.push({ productId: id, product: name, quantity: 1, price: price, total: price, image: image, notes: '' });
+            localStorage.setItem('orderDataArray', JSON.stringify(arr));
+            // redirect to order page
+            window.location.href = "{{ url('/market/order') }}";
+          } catch (e) {
+            console.error('addToCart error', e);
+            alert('Gagal menambahkan ke pesanan. Coba lagi.');
+          }
+        }
+
     // Header scroll effect
     window.addEventListener('scroll', function() {
       const header = document.getElementById('mainHeader');
@@ -248,8 +288,13 @@
       return menuItem;
     }
 
-    // Load products when page loads
-    document.addEventListener('DOMContentLoaded', loadProducts);
+    // Load products when page loads (only if client-side container exists)
+    document.addEventListener('DOMContentLoaded', function() {
+      const menuItemsContainer = document.getElementById('menuItems');
+      if (menuItemsContainer) {
+        loadProducts();
+      }
+    });
 
     function openModal(productName, imageSrc, description, price) {
       currentProduct = productName;
@@ -332,7 +377,7 @@
       
       // Close modal and go to order page
       closeModal();
-      window.location.href = 'order.html';
+      window.location.href = "{{ url('/market/order') }}";
     }
 
     // Close modal ketika klik di luar modal
@@ -348,6 +393,11 @@
       if (event.key === 'Escape') {
         closeModal();
       }
+    });
+
+    // Ensure default filter applied on load
+    document.addEventListener('DOMContentLoaded', function() {
+      try { filterMenu('semua'); } catch (e) { /* ignore */ }
     });
   </script>
 </body>
