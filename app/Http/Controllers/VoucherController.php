@@ -64,7 +64,7 @@ class VoucherController extends Controller
             'message' => 'Voucher berhasil diperbarui'
         ]);
     }
-
+ 
 
     /* ================= TOGGLE ================= */
     public function toggle(VoucherModel $voucher)

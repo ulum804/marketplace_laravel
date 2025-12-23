@@ -954,6 +954,189 @@
       }
     }
 
+    function previewBundleImageUpload() {
+      const fileInput = document.getElementById('bundleImageFile');
+      const preview = document.getElementById('bundleImagePreview');
+      const hiddenInput = document.getElementById('bundleImage');
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          preview.innerHTML = `<img src="${e.target.result}" alt="Preview Bundle">`;
+          hiddenInput.value = e.target.result;
+        };
+
+        reader.onerror = function() {
+          preview.innerHTML = '<div class="image-preview-text">Gagal membaca gambar</div>';
+        };
+
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        preview.innerHTML = '<div class="image-preview-text">Preview gambar paket akan muncul di sini</div>';
+        hiddenInput.value = '';
+      }
+    }
+
+    let bundleIndex = 0;
+
+    const produk = @json($produk); // ← data dari database
+
+    function addBundleItemSlot() {
+      const container = document.getElementById('bundleItemsList');
+
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '8px';
+
+      row.innerHTML = `
+        <select name="bundle_items[${bundleIndex}][product_id]" required>
+          <option value="">-- Pilih Produk --</option>
+          ${produk.map(p =>
+            `<option value="${p.id}">${p.nama_produk}</option>`
+          ).join('')}
+        </select>
+
+        <input type="number" name="bundle_items[${bundleIndex}][qty]" min="1" value="1" style="width:80px" required>
+        <button type="button" onclick="this.parentElement.remove()" class="btn btn-danger"> ✕ </button>`;
+
+        // event update preview
+        row.querySelector('select').addEventListener('change', updateBundlePreview);
+        row.querySelector('input').addEventListener('input', updateBundlePreview);
+
+        // hapus item + update preview
+        row.querySelector('button').addEventListener('click', () => {
+          row.remove();
+          updateBundlePreview();
+        });
+
+      container.appendChild(row);
+      bundleIndex++;
+    }
+
+    function updateBundlePreview() {
+      const preview = document.getElementById('bundlePreview');
+      const rows = document.querySelectorAll('#bundleItemsList > div');
+
+      if (rows.length === 0) {
+        preview.textContent = 'Belum ada item';
+        return;
+      }
+
+      let result = [];
+
+      rows.forEach(row => {
+        const select = row.querySelector('select');
+        const qtyInput = row.querySelector('input[type="number"]');
+
+        if (select.value) {
+          const productName = select.options[select.selectedIndex].text;
+          const qty = qtyInput.value;
+          result.push(`${productName} × ${qty}`);
+        }
+      });
+
+      preview.innerHTML = result.length
+        ? result.map(item => `• ${item}`).join('<br>')
+        : 'Belum ada item';
+    }
+
+    async function createBundle() {
+      const bundleName = document.getElementById('bundleName').value.trim();
+      const bundleDesc = document.getElementById('bundleDesc').value.trim();
+      const bundleDiscount = parseInt(document.getElementById('bundleDiscount').value) || 0;
+      const bundlePrice = parseInt(document.getElementById('bundlePrice').value);
+      const bundleImage = document.getElementById('bundleImage').value.trim();
+
+      if (!bundleName || !bundleDesc || !bundlePrice || !bundleImage) {
+        showAlert('Semua field bundling harus diisi!', 'error');
+        return;
+      }
+
+      // Collect bundle items
+      const bundleItems = [];
+      const rows = document.querySelectorAll('#bundleItemsList > div');
+      rows.forEach(row => {
+        const select = row.querySelector('select');
+        const qtyInput = row.querySelector('input[type="number"]');
+        if (select.value && qtyInput.value) {
+          bundleItems.push({
+            product_id: parseInt(select.value),
+            qty: parseInt(qtyInput.value)
+          });
+        }
+      });
+
+      if (bundleItems.length === 0) {
+        showAlert('Tambahkan minimal satu item ke bundling!', 'error');
+        return;
+      }
+
+      // Prepare data for submission
+      const bundleData = {
+        nama_produk: bundleName,
+        deskripsi: bundleDesc,
+        harga: bundlePrice,
+        gambar: bundleImage,
+        kategori: 'secret',
+        bundle_items: bundleItems
+      };
+
+      try {
+        const response = await fetch('/admin/products', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify(bundleData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          showAlert('✅ Bundling berhasil dibuat!');
+          cancelBundleForm();
+          setTimeout(() => {
+            switchTab('products');
+            loadProducts();
+          }, 1000);
+        } else {
+          showAlert('Gagal membuat bundling!', 'error');
+        }
+      } catch (error) {
+        console.error('Error creating bundle:', error);
+        showAlert('Terjadi kesalahan saat membuat bundling!', 'error');
+      }
+    }
+
+    function cancelBundleForm() {
+      document.getElementById('bundleFormSection').style.display = 'none';
+      document.getElementById('bundleName').value = '';
+      document.getElementById('bundleDesc').value = '';
+      document.getElementById('bundleDiscount').value = '';
+      document.getElementById('bundlePrice').value = '';
+      document.getElementById('bundleImage').value = '';
+      document.getElementById('bundleImagePreview').innerHTML = '<div class="image-preview-text">Preview gambar paket akan muncul di sini</div>';
+      document.getElementById('bundleItemsList').innerHTML = '';
+      updateBundlePreview();
+    }
+
+
+  //   let bundleItems = []; 
+  //   function renderBundlePreview() {
+  //   const preview = document.getElementById('bundlePreview');
+
+  //   if (bundleItems.length === 0) {
+  //     preview.innerHTML = 'Belum ada item';
+  //     return;
+  //   }
+
+  //   preview.innerHTML = bundleItems
+  //     .map(item => `• ${item.nama} × ${item.qty}`)
+  //     .join('<br>');
+  // }
+
     async function updateDashboard() {
       try {
         // Fetch products from database

@@ -34,6 +34,9 @@ class ProdukController extends Controller
             'harga' => 'required|integer|min:0',
             'gambar' => 'required|string', // Base64 image data
             'kategori' => 'nullable|string|max:50',
+            'bundle_items' => 'nullable|array', // For bundles
+            'bundle_items.*.product_id' => 'required_with:bundle_items|integer|exists:produk,id',
+            'bundle_items.*.qty' => 'required_with:bundle_items|integer|min:1',
         ]);
 
         // Decode base64 image and save to storage
@@ -56,6 +59,9 @@ class ProdukController extends Controller
         // Ensure kategori default
         if (!isset($validated['kategori']) || !$validated['kategori']) {
             $validated['kategori'] = 'utama';
+        }
+        if (isset($validated['bundle_items'])) {
+            $validated['bundle_items'] = json_encode($validated['bundle_items']);
         }
 
         ProdukModel::create($validated);
@@ -85,6 +91,9 @@ class ProdukController extends Controller
             'harga' => 'required|integer|min:0',
             'gambar' => 'nullable|string',
             'kategori' => 'nullable|string|max:50',
+            'bundle_items' => 'nullable|array', // For bundles
+            'bundle_items.*.product_id' => 'required_with:bundle_items|integer|exists:produk,id',
+            'bundle_items.*.qty' => 'required_with:bundle_items|integer|min:1',
         ]);
 
         // Handle image update if provided

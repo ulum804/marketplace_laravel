@@ -82,6 +82,21 @@
           <div class="menu-text-content">
             <h4>{{ $item->nama_produk }}</h4>
             <p>{{ $item->deskripsi }}</p>
+            @if($item->kategori === 'secret' && $item->bundle_items)
+              <div class="bundle-items">
+                <strong>Isi Paket:</strong>
+                <ul>
+                  @foreach(json_decode($item->bundle_items, true) as $bundleItem)
+                    @php
+                      $product = \App\Models\ProdukModel::find($bundleItem['product_id']);
+                    @endphp
+                    @if($product)
+                      <li>{{ $product->nama_produk }} × {{ $bundleItem['qty'] }}</li>
+                    @endif
+                  @endforeach
+                </ul>
+              </div>
+            @endif
             <div class="menu-price">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
           </div>
         </div>

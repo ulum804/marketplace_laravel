@@ -21,7 +21,8 @@ class TokoController extends Controller
             return response()->json($toko);
         }
         $vouchers = VoucherModel::orderBy('created_at', 'desc')->get();
-        return view('admin.admin', compact('toko','vouchers'));
+        $produk = ProdukModel::all();
+        return view('admin.admin', compact('toko','vouchers','produk'));
         // $buku = Buku::all();
         // print_r($buku);
         // return view('buku.index', compact('buku'))
@@ -89,7 +90,7 @@ class TokoController extends Controller
             'message' => 'Pesanan berhasil disimpan'
         ]);
     }
-
+ 
     /**
      * Display the specified resource.
      */

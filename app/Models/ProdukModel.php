@@ -12,6 +12,7 @@ class ProdukModel extends Model
         'deskripsi',
         'harga',
         'gambar',
-        'kategori'
+        'kategori',
+        'bundle_items',
     ];
 }
