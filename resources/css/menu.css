@@ -785,3 +785,45 @@ nav .login-icon.active svg {
       color: white;
       box-shadow: 0 8px 25px rgba(255,140,66,0.4);
     }
+
+    /* ===== Bundle / Secret Paket Styling ===== */
+/* /* ===== Bundle / Secret Paket Styling ===== */
+/* .bundle-items {
+  margin-top: 12px;
+  padding: 12px 14px;
+  /* background: linear-gradient(135deg, #fff7ef, #ffe9d6); */
+  /* border-radius: 14px;
+  border-left: 4px solid var(--orange);
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.15); */
+
+
+.bundle-items strong {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--orange);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bundle-items ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bundle-items li {
+  font-size: 0.85rem;
+  color: #444;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bundle-items li::before {
+  content: "✔";
+  color: var(--orange);
+  font-size: 0.75rem;
+}

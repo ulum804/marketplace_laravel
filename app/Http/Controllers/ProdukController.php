@@ -14,13 +14,14 @@ class ProdukController extends Controller
     public function index()
     {
         $produk = ProdukModel::all();
+        $produkMap = ProdukModel::pluck('nama_produk', 'id');
 
-        // Always return JSON for API routes or AJAX requests
-        if (request()->is('api/*') || request()->ajax()) {
+        // Return JSON for API routes or AJAX requests
+        if (request()->is('api/*') || request()->is('admin/*') || request()->ajax()) {
             return response()->json($produk);
         }
 
-        return view('market.menu', compact('produk'));
+        return view('market.menu', compact('produk','produkMap'));
     }
 
     /**

@@ -82,34 +82,64 @@
           <div class="menu-text-content">
             <h4>{{ $item->nama_produk }}</h4>
             <p>{{ $item->deskripsi }}</p>
-            @if($item->kategori === 'secret' && $item->bundle_items)
+            @if (strtolower(trim($item->kategori)) === 'secret' && !empty($item->bundle_items))
+              <div class="bundle-items">
+                <strong>isi paket :</strong>
+                <ul>
+                  @php
+                    $bundleItems = is_string($item->bundle_items) ? json_decode($item->bundle_items, true) : $item->bundle_items;
+                  @endphp
+                  @if(is_array($bundleItems))
+                    @foreach ($bundleItems as $bundleItem)
+                      @if (isset($produkMap[$bundleItem['product_id']]))
+                      <li>
+                         {{ $produkMap[$bundleItem['product_id']] ?? 'Produk tidak ditemukan' }} × {{ $bundleItem['qty'] }}
+                      </li>
+                      @endif
+                    @endforeach
+                  @endif
+                </ul>
+              </div>
+            @endif
+            {{-- @if($item->kategori === 'secret' && $item->bundle_items)
               <div class="bundle-items">
                 <strong>Isi Paket:</strong>
-                <ul>
-                  @foreach(json_decode($item->bundle_items, true) as $bundleItem)
+                <ul> --}}
+                  {{-- @foreach ($item->bundle_items as $bundleItem)
+                     <li>
+                        {{ $produkMap[$bundleItem['product_id']] ?? 'Produk tidak ditemukan' }} × {{ $bundleItem['qty'] }}
+                     </li>
+                  @endforeach --}}
+                  {{-- @foreach(json_decode($item->bundle_items, true) as $bundleItem)
                     @php
                       $product = \App\Models\ProdukModel::find($bundleItem['product_id']);
                     @endphp
                     @if($product)
                       <li>{{ $product->nama_produk }} × {{ $bundleItem['qty'] }}</li>
                     @endif
-                  @endforeach
-                </ul>
+                  @endforeach --}}
+                      {{-- @foreach($item->bundle_items as $bundleItem)
+                        <li>
+                         {{ \App\Models\ProdukModel::find($bundleItem['product_id'])->nama_produk ?? 'Produk tidak ditemukan' }}
+                         × {{ $bundleItem['qty'] }}
+                         </li>
+                      @endforeach --}}
+                {{-- </ul>
               </div>
-            @endif
+            @endif --}}
             <div class="menu-price">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
           </div>
         </div>
-        <div class="menu-actions">
+        {{-- <div class="menu-actions">
           <button class="cart-btn" onclick="addToCart({{ $item->id }}, {!! json_encode($item->nama_produk) !!}, {!! json_encode('/' . $item->gambar) !!}, {{ $item->harga }})">🛒</button>
-        </div>
+        </div> --}}
       </div>
       @endforeach
     </div>
   </section>
 
   <!-- Modal Pop-up -->
-  {{-- <div id="orderModal" class="modal">
+  <div id="orderModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
         <h2>🛒 Detail Pesanan</h2>
@@ -161,7 +191,7 @@
         <button class="order-btn" onclick="proceedToOrder()">🛒 Pesan Sekarang</button>
       </div>
     </div>
-  </div> --}}
+  </div>
 
   <!-- FOOTER -->
   <footer>

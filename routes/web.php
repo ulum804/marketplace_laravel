@@ -20,7 +20,8 @@ Route::prefix('market')->group(function () {
 
     Route::get('/order', function () {
         $produk = \App\Models\ProdukModel::all();
-        return view('market.order', compact('produk'));
+        $produkMap = \App\Models\ProdukModel::pluck('nama_produk', 'id');
+        return view('market.order', compact('produk', 'produkMap'));
     });
 
     Route::post('/store', [TokoController::class, 'store'])

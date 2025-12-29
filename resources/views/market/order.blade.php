@@ -53,6 +53,25 @@
                       <div class="menu-text-content">
                         <h4>{{ $item->nama_produk }}</h4>
                         <p>{{ $item->deskripsi }}</p>
+                         @if (strtolower(trim($item->kategori)) === 'secret' && !empty($item->bundle_items))
+              <div class="bundle-items">
+                <strong>isi paket :</strong>
+                <ul>
+                  @php
+                    $bundleItems = is_string($item->bundle_items) ? json_decode($item->bundle_items, true) : $item->bundle_items;
+                  @endphp
+                  @if(is_array($bundleItems))
+                    @foreach ($bundleItems as $bundleItem)
+                      @if (isset($produkMap[$bundleItem['product_id']]))
+                      <li>
+                         {{ $produkMap[$bundleItem['product_id']] ?? 'Produk tidak ditemukan' }} × {{ $bundleItem['qty'] }}
+                      </li>
+                      @endif
+                    @endforeach
+                  @endif
+                </ul>
+              </div>
+            @endif
                         <div class="menu-price">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
                       </div>
                     </div>

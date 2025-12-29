@@ -15,4 +15,8 @@ class ProdukModel extends Model
         'kategori',
         'bundle_items',
     ];
+
+       protected $casts = [
+        'bundle_items' => 'array', // 🔥 INI PENTING
+    ];
 }

@@ -592,20 +592,41 @@
             return;
           }
 
-          container.innerHTML = products.map((product) => `
-            <div class="product-card">
-              <img src="/${product.gambar}" alt="${product.nama_produk}" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
-              <div class="product-info">
-                <h4>${product.nama_produk}</h4>
-                <p>${product.deskripsi}</p>
-                <div class="product-price">${formatRupiah(product.harga)}</div>
-                <div class="product-actions">
-                  <button class="btn btn-edit" onclick="openEditModal(${product.id})">Edit</button>
-                  <button class="btn btn-delete" onclick="confirmDelete(${product.id})">Hapus</button>
+          container.innerHTML = products.map((product) => {
+            let bundleInfo = '';
+            if (product.kategori === 'secret' && product.bundle_items) {
+              try {
+                const bundleItems = typeof product.bundle_items === 'string' ? JSON.parse(product.bundle_items) : product.bundle_items;
+                if (Array.isArray(bundleItems) && bundleItems.length > 0) {
+                  const itemDetails = bundleItems.map(item => {
+                    const productName = produk.find(p => p.id == item.product_id)?.nama_produk || 'Produk tidak ditemukan';
+                    return `• ${productName} × ${item.qty}`;
+                  }).join('<br>');
+                  bundleInfo = `<div class="bundle-contents" style="margin-top: 8px; padding: 8px; background: #f0f8ff; border-radius: 6px; font-size: 0.85rem; color: #555;">
+                    <strong>📦 Isi Paket:</strong><br>${itemDetails}
+                  </div>`;
+                }
+              } catch (e) {
+                console.error('Error parsing bundle items:', e);
+              }
+            }
+
+            return `
+              <div class="product-card">
+                <img src="/${product.gambar}" alt="${product.nama_produk}" onerror="this.src='https://via.placeholder.com/300x180?text=No+Image'">
+                <div class="product-info">
+                  <h4>${product.nama_produk}</h4>
+                  <p>${product.deskripsi}</p>
+                  <div class="product-price">${formatRupiah(product.harga)}</div>
+                  ${bundleInfo}
+                  <div class="product-actions">
+                    <button class="btn btn-edit" onclick="openEditModal(${product.id})">Edit</button>
+                    <button class="btn btn-delete" onclick="confirmDelete(${product.id})">Hapus</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         } else {
           console.error('Failed to load products');
           const container = document.getElementById('productList');
