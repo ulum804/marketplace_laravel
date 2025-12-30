@@ -148,11 +148,19 @@
       <button class="btn btn-primary" onclick="switchTab('addproduct')">
         + Tambah Produk Baru
       </button>
+         <div class="menu-filter-buttons">
+        <button class="filter-btn active" onclick="filterMenu('semua')">📋 Semua Menu</button>
+        <button class="filter-btn" onclick="filterMenu('andalan')">⭐ Menu Andalan</button>
+        <button class="filter-btn" onclick="filterMenu('utama')">🍽️ Menu Utama</button>
+        <button class="filter-btn" onclick="filterMenu('secret')">🎁 Secret Paket</button>
+      </div>
     </div>
 
     <div class="product-grid" id="productList">
+   
       <!-- Products loaded here -->
     </div>
+
   </div>
 
   <!-- ================= Orders Tab ================= -->
@@ -165,7 +173,7 @@
             <th>Produk</th>
             <th>Alamat</th>
             <th>Catatan</th>
-            {{-- <th>Subtotal</th> --}}
+            <th>Subtotal</th>
             <th>Total</th>
             <th>Voucher</th>
             <th>Aksi</th>
@@ -178,7 +186,7 @@
               <td>{{ $item->produk }}</td>
               <td>{{ $item->alamat }}</td>
               <td>{{ $item->catatan ?? '-' }}</td>
-              {{-- <td>Rp {{ number_format($item->original_total ?? $item->total, 0, ',', '.') }}</td> --}}
+              <td>Rp {{ number_format($item->original_total ?? $item->total, 0, ',', '.') }}</td>
               <td >Rp {{ number_format($item->total, 0, ',', '.') }}</td>
               <td>{{ $item->voucher_code ? $item->voucher_code : '-' }}</td>
               <td>
@@ -236,8 +244,8 @@
             <div class="form-group">
             <label>Kategori Produk *</label>
             <select id="productCategory" required style="padding:12px;border:1px solid var(--border);border-radius:8px;width:100%;max-width:320px;" onchange="updateIncludesInputVisibility()">
-              <option value="andalan">⭐ Menu Andalan</option>
-              <option value="utama" selected>🍽️ Menu Utama</option>
+              <option value="andalan" selected>⭐ Menu Andalan</option>
+              <option value="utama" >🍽️ Menu Utama</option>
               <option value="secret">🎁 Secret Paket</option>
             </select>
             <div id="bundleCountInfo" style="display:none;margin-top:10px;padding:12px;background:#fffbf5;border-left:4px solid var(--orange);border-radius:6px;color:#666;font-size:0.9rem;">
@@ -570,12 +578,12 @@
       }
 
       // load data
-      if (tabName === 'products') loadProducts();
+      if (tabName === 'products') loadProducts(currentFilter);
       if (tabName === 'dashboard') updateDashboard();
     }
 
     // Load products
-    async function loadProducts() {
+    async function loadProducts(filter = 'semua') {
       try {
         const response = await fetch('/admin/products', {
           headers: {
@@ -585,11 +593,18 @@
         });
 
         if (response.ok) {
-          const products = await response.json();
+          let products = await response.json();
+
+          // Apply filter
+          if (filter !== 'semua') {
+            products = products.filter(product => product.kategori === filter);
+          }
+
           const container = document.getElementById('productList');
 
           if (products.length === 0) {
-            container.innerHTML = '<p style="color: #666; grid-column: 1/-1; text-align: center;">Belum ada produk. Silakan tambah produk baru.</p>';
+            const filterText = filter === 'semua' ? '' : ` untuk kategori "${filter}"`;
+            container.innerHTML = `<p style="color: #666; grid-column: 1/-1; text-align: center;">Belum ada produk${filterText}. Silakan tambah produk baru.</p>`;
             return;
           }
 
@@ -1001,6 +1016,7 @@
     }
 
     let bundleIndex = 0;
+    let currentFilter = 'semua'; // Track current filter
 
     const produk = @json($produk); // ← data dari database
 
@@ -1457,10 +1473,45 @@
 
   renderAdminVouchers();
 }
+ // Filter menu by category (semua, andalan, utama, secret)
+        // function filterMenu(category) {
+        //   // toggle active class on buttons
+        //   document.querySelectorAll('.menu-filter-buttons .filter-btn').forEach(btn => {
+        //     btn.classList.toggle('active', btn.getAttribute('onclick')?.includes("filterMenu('" + category + "')"));
+        //   });
 
+        //   const items = document.querySelectorAll('.menu-items .menu-item');
+        //   items.forEach(item => {
+        //     const cat = (item.getAttribute('data-category') || 'utama').toLowerCase();
+        //     if (category === 'semua' || cat === category.toLowerCase()) {
+        //       item.style.display = '';
+        //     } else {
+        //       item.style.display = 'none';
+        //     }
+        //   });
+        // }
+
+ function filterMenu(category) {
+    // Update current filter
+    currentFilter = category;
+
+    // Update active button styling
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Find and activate the clicked button
+    const activeBtn = Array.from(document.querySelectorAll('.filter-btn'))
+      .find(btn => btn.getAttribute('onclick')?.includes(`'${category}'`));
+
+    if (activeBtn) activeBtn.classList.add('active');
+
+    // Load products with the new filter
+    loadProducts(category);
+  }
 
     // Initialize
-    loadProducts();
+    loadProducts(currentFilter);
     updateDashboard();
     renderAdminVouchers();
 </script>

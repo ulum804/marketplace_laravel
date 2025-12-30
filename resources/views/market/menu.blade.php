@@ -256,19 +256,19 @@
         }
 
         // Add product to local order cart and redirect to order page
-        function addToCart(id, name, image, price) {
-          try {
-            const existing = localStorage.getItem('orderDataArray');
-            const arr = existing ? JSON.parse(existing) : [];
-            arr.push({ productId: id, product: name, quantity: 1, price: price, total: price, image: image, notes: '' });
-            localStorage.setItem('orderDataArray', JSON.stringify(arr));
-            // redirect to order page
-            window.location.href = "{{ url('/market/order') }}";
-          } catch (e) {
-            console.error('addToCart error', e);
-            alert('Gagal menambahkan ke pesanan. Coba lagi.');
-          }
-        }
+        // function addToCart(id, name, image, price) {
+        //   try {
+        //     const existing = localStorage.getItem('orderDataArray');
+        //     const arr = existing ? JSON.parse(existing) : [];
+        //     arr.push({ productId: id, product: name, quantity: 1, price: price, total: price, image: image, notes: '' });
+        //     localStorage.setItem('orderDataArray', JSON.stringify(arr));
+        //     // redirect to order page
+        //     window.location.href = "{{ url('/market/order') }}";
+        //   } catch (e) {
+        //     console.error('addToCart error', e);
+        //     alert('Gagal menambahkan ke pesanan. Coba lagi.');
+        //   }
+        // }
 
     // Header scroll effect
     window.addEventListener('scroll', function() {

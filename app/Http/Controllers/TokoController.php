@@ -48,6 +48,7 @@ class TokoController extends Controller
             'produk'   => 'required|string',
             'catatan'  => 'nullable|string',
             'voucher'  => 'nullable|string|max:191',
+            'subtotal'    => 'required|numeric|min:0',
             'total'    => 'required|numeric|min:0',
         ]);
 
@@ -81,7 +82,7 @@ class TokoController extends Controller
             'produk'         => $validated['produk'],
             'catatan'        => $validated['catatan'] ?? null,
             'total'          => $validated['total'],
-            'original_total' => $validated['total'], // sementara sama
+            'original_total' => $validated['subtotal'], // sementara sama
             'voucher_code'   => $validated['voucher'] ?? null,
         ]);
 

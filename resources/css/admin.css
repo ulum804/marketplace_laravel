@@ -672,3 +672,37 @@
   font-size: 20px;
   margin-bottom: 6px;
 }
+ .menu-filter-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: white;
+      border: 2px solid var(--orange);
+      color: var(--orange);
+      padding: 12px 24px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 10px rgba(255,140,66,0.15);
+    }
+
+    .filter-btn:hover {
+      background: var(--orange);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255,140,66,0.3);
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, var(--orange), #ff6f00);
+      color: white;
+      box-shadow: 0 8px 25px rgba(255,140,66,0.4);
+    }
