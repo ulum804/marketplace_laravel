@@ -258,12 +258,13 @@
 
               <div class="form-group">
                 <label>Diskon Bundling (%) *</label>
-                <input type="number" id="bundleDiscount" placeholder="10" min="0" max="100">
+                <input type="number" id="bundleDiscount" placeholder="10" min="0" max="100" oninput="calculateBundlePrice()">
               </div>
 
               <div class="form-group">
                 <label>Harga Paket (Rp) *</label>
-                <input type="number" id="bundlePrice" placeholder="15000" min="0">
+                <input type="number" id="bundlePrice" placeholder="15000" min="0" readonly>
+                <small style="color: #666; font-size: 0.85rem;">Harga dihitung otomatis berdasarkan item dan diskon</small>
               </div>
 
               <div class="form-group">
@@ -1003,6 +1004,32 @@
 
     const produk = @json($produk); // ← data dari database
 
+    function calculateBundlePrice() {
+      const discountInput = document.getElementById('bundleDiscount');
+      const priceInput = document.getElementById('bundlePrice');
+      const discountPercent = parseFloat(discountInput.value) || 0;
+
+      const rows = document.querySelectorAll('#bundleItemsList > div');
+      let totalPrice = 0;
+
+      rows.forEach(row => {
+        const select = row.querySelector('select');
+        const qtyInput = row.querySelector('input[type="number"]');
+        const productId = parseInt(select.value);
+        const qty = parseInt(qtyInput.value) || 0;
+
+        if (productId && qty > 0) {
+          const product = produk.find(p => p.id === productId);
+          if (product) {
+            totalPrice += product.harga * qty;
+          }
+        }
+      });
+
+      const discountedPrice = totalPrice * (1 - discountPercent / 100);
+      priceInput.value = Math.round(discountedPrice);
+    }
+
     function addBundleItemSlot() {
       const container = document.getElementById('bundleItemsList');
 
@@ -1025,10 +1052,15 @@
         row.querySelector('select').addEventListener('change', updateBundlePreview);
         row.querySelector('input').addEventListener('input', updateBundlePreview);
 
+        // event calculate price
+        row.querySelector('select').addEventListener('change', calculateBundlePrice);
+        row.querySelector('input').addEventListener('input', calculateBundlePrice);
+
         // hapus item + update preview
         row.querySelector('button').addEventListener('click', () => {
           row.remove();
           updateBundlePreview();
+          calculateBundlePrice();
         });
 
       container.appendChild(row);
@@ -1141,6 +1173,7 @@
       document.getElementById('bundleImagePreview').innerHTML = '<div class="image-preview-text">Preview gambar paket akan muncul di sini</div>';
       document.getElementById('bundleItemsList').innerHTML = '';
       updateBundlePreview();
+      calculateBundlePrice();
     }
 
 
