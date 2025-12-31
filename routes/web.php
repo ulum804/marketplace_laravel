@@ -17,7 +17,10 @@ Route::prefix('market')->group(function () {
         $produkUtama = \App\Models\ProdukModel::where('kategori', 'utama')->take(3)->get();
         return view('market.home', compact('produk', 'produkUtama'));
     });
-    Route::get('/about', fn () => view('market.about'));
+    Route::get('/about', function () {
+        $produkUtama = \App\Models\ProdukModel::where('kategori', 'utama')->take(4)->get();
+        return view('market.about', compact('produkUtama'));
+    });
 
     Route::get('/menu', [ProdukController::class, 'index'])
         ->name('market.menu');

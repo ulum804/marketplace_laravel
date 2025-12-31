@@ -134,10 +134,19 @@
       <h3 style="color:var(--orange);" class="reveal-text-up">Menu Favorit</h3>
       <p style="color:#555;" class="reveal-text-up">Klik foto untuk memperbesar dan lihat animasinya!</p>
       <div class="gallery-grid">
-        <img src="{{ asset('image/gallery1.jpg') }}" alt="Dimsum" onclick="openLightbox('asset/gallery1.jpg')" class="clickable-img reveal-img" />
+
+      @foreach ($produkUtama as $item)
+              <article class="menu-card" data-id="{{ $item->id }}">
+                <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama_produk }}">
+                <h4>{{ $item->nama_produk }}</h4>
+                <p>{{ $item->deskripsi }}</p>
+              </article>
+      @endforeach
+
+        {{-- <img src="{{ asset('image/gallery1.jpg') }}" alt="Dimsum" onclick="openLightbox('asset/gallery1.jpg')" class="clickable-img reveal-img" />
         <img src="{{ asset('image/gallery2.png') }}" onclick="openLightbox('asset/gallery2.png')" class="clickable-img reveal-img" />
         <img src="{{ asset('image/gallery3.jpg') }}" onclick="openLightbox('asset/gallery3.jpg')" class="clickable-img reveal-img" />
-        <img src="{{ asset('image/gallery4.jpg') }}" alt="Saus Signature" onclick="openLightbox('asset/gallery4.jpg')" class="clickable-img reveal-img" />
+        <img src="{{ asset('image/gallery4.jpg') }}" alt="Saus Signature" onclick="openLightbox('asset/gallery4.jpg')" class="clickable-img reveal-img" /> --}}
       </div>
     </section>
 
