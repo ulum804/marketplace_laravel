@@ -12,7 +12,11 @@ Route::get('/', function () {
 
 Route::prefix('market')->group(function () {
 
-    Route::get('/home', fn () => view('market.home'));
+    Route::get('/home', function () {
+        $produk = \App\Models\ProdukModel::where('kategori', 'andalan')->take(3)->get();
+        $produkUtama = \App\Models\ProdukModel::where('kategori', 'utama')->take(3)->get();
+        return view('market.home', compact('produk', 'produkUtama'));
+    });
     Route::get('/about', fn () => view('market.about'));
 
     Route::get('/menu', [ProdukController::class, 'index'])

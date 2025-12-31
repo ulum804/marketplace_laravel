@@ -81,7 +81,16 @@
     <div style="text-align:center;color:var(--muted);max-width:700px;margin:6px auto 22px">Pilih cepat, lalu ke halaman Order untuk mengisi data dan menyelesaikan pembayaran.</div>
 
     <div class="menu-grid">
-      <article class="menu-card" data-id="wonton">
+
+         @foreach ($produk as $item)
+        <article class="menu-card" data-id="{{ $item->id }}">
+          <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama_produk }}">
+          <h4>{{ $item->nama_produk }}</h4>
+          <p>{{ $item->deskripsi }}</p>
+        </article>
+      @endforeach
+
+      {{-- <article class="menu-card" data-id="wonton">
         <img src="{{ asset('image/wontonhome.jpg') }}" alt="Wonton Chili Oil">
         <h4>Wonton Chili Oil</h4>
         <p>Wonton lembut + chili oil homemade. Paket 6 pcs.</p>
@@ -97,7 +106,7 @@
         <img src="{{ asset('image/dimsumhome.jpg') }}" alt="Dimsum Premium">
         <h4>Dimsum Premium</h4>
         <p>Isi 6 pcs, tekstur lembut, cocok untuk sharing.</p>
-      </article>
+      </article> --}}
     </div>
   </section>
  <!-- Kenapa Harus KNiverse -->
@@ -132,7 +141,16 @@
     <div style="text-align:center;color:var(--muted);max-width:700px;margin:6px auto 22px">Klik menu untuk lihat detail di halaman Menu atau lanjut ke Order.</div>
 
     <div class="menu-grid">
-      <article class="menu-card" data-id="gyoza">
+
+         @foreach ($produkUtama as $item)
+        <article class="menu-card" data-id="{{ $item->id }}">
+          <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama_produk }}">
+          <h4>{{ $item->nama_produk }}</h4>
+          <p>{{ $item->deskripsi }}</p>
+        </article>
+      @endforeach
+
+      {{-- <article class="menu-card" data-id="gyoza">
         <img src="{{ asset('image/jamurenokiy.jpg') }}" alt="Gyoza Premium">
         <h4>Jamur enoki Crispy</h4>
         <p>jamur enoki yang cruncy, dibalut sauce spesial.</p>
@@ -148,7 +166,7 @@
         <img src="{{ asset('image/risol-mayo.jpg') }}" alt="Saus Chili Garlic">
         <h4>Risol Mayo</h4>
         <p>crispiy pedas gurih — favorit pelanggan.</p>
-      </article>
+      </article> --}}
     </div>
   </section>
 

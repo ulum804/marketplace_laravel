@@ -17,7 +17,7 @@ class VoucherController extends Controller
         return VoucherModel::orderBy('created_at', 'desc')->get();
     }
 
-    abort(404);
+    // abort(404);
     }
      public function store(Request $request)
     {
