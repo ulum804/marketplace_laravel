@@ -97,7 +97,13 @@ class TokoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $order = TokoModel::findOrFail($id);
+
+        if (request()->ajax()) {
+            return response()->json($order);
+        }
+
+        return view('admin.order_detail', compact('order'));
     }
 
     /**

@@ -196,9 +196,26 @@ nav .login-icon.active svg {
 
     /* Gallery */
     .gallery{padding:36px 6%;background:white;border-radius:12px;margin:28px auto;max-width:1200px}
-    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
-    .gallery-grid img{width:100%;border-radius:10px;cursor:pointer;transition:transform .18s ease}
+    .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-left: 50px;}
+    .gallery-grid img{width: 200px;       
+    height: 200px;      
+    object-fit: cover;  
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform .18s ease;
+    }
     .gallery-grid img:hover{transform:translateY(-6px) scale(1.02)}
+    .gallery-grid p{
+      /* grid-column:1/-1; */
+      text-align:justify;
+      font-size:15px;
+      color:#555;
+      margin-top:0px
+    }
+    .gallery-grid h4 {
+      /* grid-column:1/-1; */
+      margin-bottom:0px
+    }
 
     /* Badge ribbon */
     .ribbon{position:relative}

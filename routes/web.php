@@ -7,7 +7,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VoucherController;
 
 Route::get('/', function () {
-    return view('market.home');
+    $produk = \App\Models\ProdukModel::where('kategori', 'andalan')->take(3)->get();
+    $produkUtama = \App\Models\ProdukModel::where('kategori', 'utama')->take(3)->get();
+    return view('market.home', compact('produk', 'produkUtama'));
 });
 
 Route::prefix('market')->group(function () {
@@ -18,7 +20,7 @@ Route::prefix('market')->group(function () {
         return view('market.home', compact('produk', 'produkUtama'));
     });
     Route::get('/about', function () {
-        $produk = \App\Models\ProdukModel::where('kategori', 'utama')->take(4)->get();
+        $produk = \App\Models\ProdukModel::where('kategori', 'andalan')->take(4)->get();
         return view('market.about', compact('produk'));
     });
 
@@ -68,6 +70,9 @@ Route::prefix('admin')->group(function () {
     /* ======================
      |  ORDERS
      ====================== */
+    Route::get('/orders/{id}', [TokoController::class, 'show'])
+        ->name('admin.orders.show');
+
     Route::delete('/orders/{id}', [TokoController::class, 'destroy'])
         ->name('admin.orders.destroy');
 

@@ -181,7 +181,7 @@
         </thead>
         <tbody id="ordersTableBody">
           @foreach ($toko as $item)
-            <tr data-id="{{ $item->id }}">
+            <tr data-id="{{ $item->id }}" onclick="openOrderDetail({{ $item->id }})" style="cursor: pointer;">
               <td>{{ $item->nama }}</td>
               <td>{{ $item->produk }}</td>
               <td>{{ $item->alamat }}</td>
@@ -190,7 +190,7 @@
               <td >Rp {{ number_format($item->total, 0, ',', '.') }}</td>
               <td>{{ $item->voucher_code ? $item->voucher_code : '-' }}</td>
               <td>
-                <button class="btn btn-delete" onclick="deleteOrder({{ $item->id }})">
+                <button class="btn btn-delete" onclick="deleteOrder({{ $item->id }})" onclick="event.stopPropagation();">
                   Hapus
                 </button>
               </td>
@@ -445,6 +445,20 @@
       <button type="submit" class="btn btn-primary">Simpan</button>
       {{-- <button type="button" onclick="closeEditVoucher()">Batal</button> --}}
     </form>
+  </div>
+</div>
+
+{{-- =================== Order Detail Modal ================= --> --}}
+<div id="orderDetailModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Detail Pesanan</h2>
+      <button class="close-modal" onclick="closeOrderDetailModal()">&times;</button>
+    </div>
+
+    <div id="orderDetailContent">
+      <!-- Order details will be loaded here -->
+    </div>
   </div>
 </div>
 
@@ -1509,6 +1523,120 @@
     // Load products with the new filter
     loadProducts(category);
   }
+
+    // Order detail modal functions
+    async function openOrderDetail(id) {
+      try {
+        const response = await fetch(`/admin/orders/${id}`, {
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const order = await response.json();
+
+          let detailHtml = `
+            <div style="padding: 20px;">
+              <h3 style="margin-bottom: 20px; color: var(--orange);">Detail Pesanan #${order.id}</h3>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <div>
+                  <h4 style="color: var(--dark); margin-bottom: 10px;">Informasi Pelanggan</h4>
+                  <p><strong>Nama:</strong> ${order.nama}</p>
+                  <p><strong>Alamat:</strong> ${order.alamat}</p>
+                  <p><strong>Catatan:</strong> ${order.catatan || '-'}</p>
+                </div>
+
+                <div>
+                  <h4 style="color: var(--dark); margin-bottom: 10px;">Detail Pembayaran</h4>
+                  <p><strong>Subtotal:</strong> Rp ${order.original_total ? order.original_total.toLocaleString('id-ID') : order.total.toLocaleString('id-ID')}</p>
+                  <p><strong>Total:</strong> Rp ${order.total.toLocaleString('id-ID')}</p>
+                  <p><strong>Voucher:</strong> ${order.voucher_code || '-'}</p>
+                </div>
+     
+
+              </div>
+
+              <h4 style="color: var(--dark); margin-bottom: 10px;">Produk yang Dipesan</h4>
+          `;
+
+          // Handle different product formats
+          if (order.produk) {
+            if (typeof order.produk === 'string') {
+              // Single product or simple string
+              detailHtml += `<p>${order.produk}</p>`;
+            } else if (Array.isArray(order.produk)) {
+              // Array of products
+              detailHtml += '<ul>';
+              order.produk.forEach(item => {
+                if (typeof item === 'object' && item.nama_produk) {
+                  detailHtml += `<li>${item.nama_produk} - ${item.qty || 1} pcs</li>`;
+                } else {
+                  detailHtml += `<li>${item}</li>`;
+                }
+              });
+              detailHtml += '</ul>';
+            } else if (typeof order.produk === 'object') {
+              // Object format
+              detailHtml += '<ul>';
+              for (const [key, value] of Object.entries(order.produk)) {
+                detailHtml += `<li>${key}: ${value}</li>`;
+              }
+              detailHtml += '</ul>';
+            }
+          } else {
+            detailHtml += '<p>Tidak ada detail produk</p>';
+          }
+
+          // Check for bundle items if it's a secret paket
+          if (order.kategori === 'secret' && order.bundle_items) {
+            try {
+              const bundleItems = typeof order.bundle_items === 'string' ? JSON.parse(order.bundle_items) : order.bundle_items;
+              if (Array.isArray(bundleItems) && bundleItems.length > 0) {
+                detailHtml += `
+                  <div class="bundle-items" style="margin-top: 20px;">
+                    <strong>isi paket :</strong>
+                    <ul style="margin-top: 10px;">
+                `;
+                bundleItems.forEach(item => {
+                  const productName = produk.find(p => p.id == item.product_id)?.nama_produk || 'Produk tidak ditemukan';
+                  detailHtml += `<li>${productName} × ${item.qty}</li>`;
+                });
+                detailHtml += `
+                    </ul>
+                  </div>
+                `;
+              }
+            } catch (e) {
+              console.error('Error parsing bundle items:', e);
+            }
+          }
+
+          detailHtml += `
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+                <p style="color: #666; font-size: 0.9rem;">
+                  <strong>Tanggal Pesanan:</strong> ${new Date(order.created_at).toLocaleString('id-ID')}
+                </p>
+              </div>
+            </div>
+          `;
+
+          document.getElementById('orderDetailContent').innerHTML = detailHtml;
+          document.getElementById('orderDetailModal').classList.add('active');
+        } else {
+          showAlert('Gagal memuat detail pesanan!', 'error');
+        }
+      } catch (error) {
+        console.error('Error loading order detail:', error);
+        showAlert('Terjadi kesalahan saat memuat detail pesanan !', 'error');
+      }
+    }
+
+    function closeOrderDetailModal() {
+      document.getElementById('orderDetailModal').classList.remove('active');
+    }
 
     // Initialize
     loadProducts(currentFilter);
