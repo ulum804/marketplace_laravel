@@ -135,7 +135,7 @@
       <p style="color:#555;" class="reveal-text-up">Klik foto untuk memperbesar dan lihat animasinya!</p>
       <div class="gallery-grid">
 
-      @foreach ($produkUtama as $item)
+      @foreach ($produk as $item)
               <article class="menu-card" data-id="{{ $item->id }}">
                 <img src="{{ asset($item->gambar) }}" alt="{{ $item->nama_produk }}">
                 <h4>{{ $item->nama_produk }}</h4>
